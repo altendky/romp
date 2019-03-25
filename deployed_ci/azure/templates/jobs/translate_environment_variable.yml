@@ -1,0 +1,7 @@
+jobs:
+  - job: ${{ parameters.variable }}
+    displayName: ${{ parameters.variable }}
+    steps:
+      - bash: |
+          echo '##vso[task.setvariable variable=v;isOutput=true]'"\$(${{ parameters.variable }})"
+        displayName: v

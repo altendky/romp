@@ -1,15 +1,17 @@
+trigger: none
+
 variables:
   archive_url: ${ROMP_ARCHIVE_URL}
   command: ${ROMP_COMMAND}
   environments: ${ROMP_ENVIRONMENTS}
 
 jobs:
-  - template: azure/templates/jobs/get_input_archive.yml
+  - template: templates/jobs/get_input_archive.yml
     parameters:
       job: get_input_archive
       archive_url: $(archive_url)
 
-  - template: azure/templates/jobs/run_command.yml
+  - template: templates/jobs/run_command.yml
     parameters:
       platform: Linux
       vmImage: 'ubuntu-16.04'
@@ -17,7 +19,7 @@ jobs:
       command: $(command)
       environments: $(environments)
 
-  - template: azure/templates/jobs/run_command.yml
+  - template: templates/jobs/run_command.yml
     parameters:
       platform: macOS
       vmImage: 'macOS-10.13'
@@ -25,7 +27,7 @@ jobs:
       command: $(command)
       environments: $(environments)
 
-  - template: azure/templates/jobs/run_command.yml
+  - template: templates/jobs/run_command.yml
     parameters:
       platform: Windows
       vmImage: 'vs2017-win2016'

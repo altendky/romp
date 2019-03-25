@@ -1,0 +1,8 @@
+steps:
+  - task: DownloadPipelineArtifact@0
+    inputs:
+      artifactName: ${{ parameters.artifactName }}
+      targetPath: $(System.DefaultWorkingDirectory)
+  - bash: |
+      tar --extract --verbose --file lock.tar.gz
+    displayName: Extract input

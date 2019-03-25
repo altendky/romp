@@ -1,7 +1,7 @@
 romp
 ====
 
-|PyPI| |Pythons| |Travis| |Azure| |GitHub|
+|PyPI| |Pythons| |Azure| |GitHub|
 
 Run on multiple platforms
 
@@ -13,11 +13,7 @@ Run on multiple platforms
    :alt: supported Python versions
    :target: https://pypi.org/project/romp/
 
-.. |Travis| image:: https://travis-ci.org/altendky/romp.svg?branch=master
-   :alt: Travis build status
-   :target: https://travis-ci.org/altendky/romp
-
-.. |Azure| image:: https://dev.azure.com/altendky/romp/_apis/build/status/altendky.romp?branchName=master
+.. |Azure| image:: https://dev.azure.com/altendky/romp/_apis/build/status/altendky.romp?branchName=develop
    :alt: Azure build status
    :target: https://dev.azure.com/altendky/romp/_build
 

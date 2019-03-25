@@ -25,9 +25,7 @@ class Build:
 
         return cls(id=id, url=url, human_url=human_url)
 
-    def wait_for_lock_build(self):
-        check_period = 15
-
+    def wait_for_lock_build(self, check_period=15):
         while True:
             print("build url:", self.url)
             response = requests.get(self.url)
@@ -157,25 +155,31 @@ def post_file(data):
     return response_json['link']
 
 
-def request_remote_lock_build(archive_url, username, personal_access_token):
+def request_remote_lock_build(
+        archive_url,
+        username,
+        personal_access_token,
+        build_request_url,
+        command,
+        environments,
+        source_branch,
+        definition_id,
+):
     parameters = {
-        'ROMP_COMMAND': './boots.py lock',
+        'ROMP_COMMAND': command,
         'ROMP_ARCHIVE_URL': archive_url,
-        'ROMP_ENVIRONMENTS': '|Linux-3.6-x64|macOS-3.6-x64',
+        'ROMP_ENVIRONMENTS': environments,
     }
 
     response = requests.post(
-        url=(
-            'https://dev.azure.com'
-            '/altendky/romp/_apis/build/builds?api-version=5.0'
-        ),
+        url=build_request_url,
         auth=requests.auth.HTTPBasicAuth(
             username,
             personal_access_token,
         ),
         json={
-            "definition": {"id": 2},
-            "sourceBranch": "lock_in_azure",
+            "definition": {"id": definition_id},
+            "sourceBranch": source_branch,
             "parameters": json.dumps(parameters),
         },
     )
