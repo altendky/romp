@@ -17,7 +17,7 @@ import romp._core
     '--build-request-url',
     default=(
         'https://dev.azure.com'
-        '/altendky/romp_deployed/_apis/build/builds?api-version=5.0'
+        '/altendky/romp/_apis/build/builds?api-version=5.0'
     )
 )
 @click.option(
