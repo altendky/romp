@@ -33,7 +33,7 @@ jobs:
           architecture: $(architecture)
       - template: ../steps/in_archive_from_artifact.yml
       - bash: |
-          ${{ parameters.command }}
+          eval ${{ parameters.command }}
         displayName: Run Command
       - task: CopyFiles@2
         inputs:
