@@ -1,0 +1,29 @@
+jobs:
+  - job: build_and_deploy
+    displayName: Build And Deploy
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: 3.7
+          architecture: x64
+      - bash: |
+          python -m venv venv
+          venv/bin/pip install twine
+          venv/bin/pip install wheel
+        displayName: Build venv
+      - bash: |
+          venv/bin/python setup.py bdist_wheel
+        displayName: Build Wheel
+      - task: CopyFiles@2
+        inputs:
+          contents: 'dist/*'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: dist
+      - bash: |
+          venv/bin/python twineontag.py
+        displayName: Twine On Tag
