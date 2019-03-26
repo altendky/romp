@@ -26,7 +26,7 @@ def publish(force=False):
 
     subprocess.check_call(
         [
-            'twine',
+            os.path.join(os.path.dirname(__file__), 'venv', 'bin', 'twine'),
             'upload',
             os.path.join(os.path.dirname(__file__), 'dist', '*'),
         ],
