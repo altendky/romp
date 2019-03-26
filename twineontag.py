@@ -31,6 +31,7 @@ def publish(force=False):
             'upload',
             os.path.join(os.path.dirname(__file__), 'dist', '*'),
         ],
+        timeout=45,
     )
 
 
