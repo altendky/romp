@@ -11,6 +11,7 @@ def publish(force=False):
             '--tags',
             '--candidates', '0',
         ],
+        timeout=15,
     )
 
     if no_tag:
