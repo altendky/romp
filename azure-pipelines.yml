@@ -1,3 +1,9 @@
+trigger:
+  branches:
+    include: ['*']
+  tags:
+    include: ['*']
+
 jobs:
   - job: build_and_deploy
     displayName: Build And Deploy
