@@ -113,30 +113,6 @@ def strip_zip_info_prefixes(prefix, zip_infos):
     return result
 
 
-# TODO: CAMPid 0743105874017581374310081
-def make_remote_lock_archive():
-    import tarfile
-    import io
-
-    archive_file = io.BytesIO()
-
-    archive = tarfile.TarFile(mode='w', fileobj=archive_file)
-
-    patterns = (
-        'boots.py',
-        'setup.cfg',
-        'requirements/*.in',
-    )
-
-    for pattern in patterns:
-        for path in glob.glob(pattern):
-            archive.add(path)
-
-    archive.close()
-
-    return archive_file.getvalue()
-
-
 def post_file(data):
     response = requests.post(
         url='https://file.io/',
@@ -167,9 +143,11 @@ def request_remote_lock_build(
 ):
     parameters = {
         'ROMP_COMMAND': command,
-        'ROMP_ARCHIVE_URL': archive_url,
         'ROMP_ENVIRONMENTS': environments,
     }
+
+    if archive_url is not None:
+        parameters['ROMP_ARCHIVE_URL'] = archive_url
 
     response = requests.post(
         url=build_request_url,

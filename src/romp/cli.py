@@ -55,7 +55,7 @@ def create_command_option(
     return create_option(
         '--command',
         default=(
-            "python -c 'import sys; print(sys.version); print(sys.platform)'",
+            "python -c 'import sys; print(sys.version); print(sys.platform)'"
         ),
         envvar=envvar,
         help='The command to be run for each target',
@@ -117,6 +117,17 @@ def create_definition_id_option(
     )
 
 
+def create_archive_option(
+        envvar='ROMP_ARCHIVE',
+):
+    return create_option(
+        '--archive',
+        envvar=envvar,
+        help='The archive to be uploaded to the build',
+        type=click.File(),
+    )
+
+
 @click.command()
 @create_personal_access_token_option()
 @create_build_request_url_option()
@@ -126,6 +137,7 @@ def create_definition_id_option(
 @create_check_period_option()
 @create_source_branch_option()
 @create_definition_id_option()
+@create_archive_option()
 def main(
         personal_access_token,
         build_request_url,
@@ -135,10 +147,15 @@ def main(
         check_period,
         source_branch,
         definition_id,
+        archive,
 ):
-    archive_bytes = romp._core.make_remote_lock_archive()
-    archive_url = romp._core.post_file(data=archive_bytes)
+    archive_url = None
+    if archive is not None:
+        archive_bytes = archive.read()
+        archive_url = romp._core.post_file(data=archive_bytes)
+
     print(archive_url)
+
     build = romp._core.request_remote_lock_build(
         archive_url=archive_url,
         username=username,
