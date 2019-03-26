@@ -31,5 +31,6 @@ jobs:
           pathToPublish: $(Build.ArtifactStagingDirectory)
           artifactName: dist
       - bash: |
+          source venv/bin/activate
           venv/bin/python twineontag.py
         displayName: Twine On Tag
