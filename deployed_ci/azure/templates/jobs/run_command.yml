@@ -33,6 +33,9 @@ jobs:
           architecture: $(architecture)
       - template: ../steps/in_archive_from_artifact.yml
       - bash: |
+          python -c 'import sys; print(sys.version); print(sys.platform)'
+        displayName: Report Python version
+      - bash: |
           eval ${{ parameters.command }}
         displayName: Run Command
       - task: CopyFiles@2
