@@ -32,4 +32,7 @@ jobs:
           artifactName: dist
       - bash: |
           venv/bin/python twineontag.py
+        env:
+          TWINE_USERNAME: $(TWINE_USERNAME)
+          TWINE_PASSWORD: $(TWINE_PASSWORD)
         displayName: Twine On Tag
