@@ -49,7 +49,7 @@ class Build:
             )
             time.sleep(check_period)
 
-    def get_lock_build_artifact(self):
+    def get_lock_build_artifact(self, artifact_file):
         # 'https://dev.azure.com/altendky/a27e6706-93a8-46b1-8098-e5134713123d/_apis/build/builds/222/artifacts?artifactName=all&fileId=615BBA316A140A61F371BA354124349281B001BE9689366DA9660AC506A1ECCE01&fileName=lock.tar.gz&api-version=5.0-preview.3'
         # url = (
         #     'https://dev.azure.com'
@@ -82,7 +82,7 @@ class Build:
 
         response = requests.get(artifact_download_url)
 
-        artifact.write(response.content)
+        artifact_file.write(response.content)
 
 
 def strip_zip_info_prefixes(prefix, zip_infos):

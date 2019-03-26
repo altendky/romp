@@ -124,7 +124,7 @@ def create_archive_option(
         '--archive',
         envvar=envvar,
         help='The archive to be uploaded to the build',
-        type=click.File(),
+        type=click.File('rb'),
     )
 
 
@@ -132,11 +132,10 @@ def create_artifact_option(
         envvar='ROMP_ARTIFACT_PATH',
 ):
     return create_option(
-        '--artifact-path',
-        'artifact',
+        '--artifact',
         envvar=envvar,
         help='The path at which to save the resulting artifact',
-        type=click.File('w'),
+        type=click.File('wb'),
     )
 
 
@@ -184,4 +183,4 @@ def main(
     build.wait_for_lock_build(check_period=check_period)
 
     if artifact is not None:
-        build.get_lock_build_artifact(artifact)
+        build.get_lock_build_artifact(artifact_file=artifact)
