@@ -128,6 +128,18 @@ def create_archive_option(
     )
 
 
+def create_artifact_option(
+        envvar='ROMP_ARTIFACT_PATH',
+):
+    return create_option(
+        '--artifact-path',
+        'artifact',
+        envvar=envvar,
+        help='The path at which to save the resulting artifact',
+        type=click.File('w'),
+    )
+
+
 @click.command()
 @create_personal_access_token_option()
 @create_build_request_url_option()
@@ -138,6 +150,7 @@ def create_archive_option(
 @create_source_branch_option()
 @create_definition_id_option()
 @create_archive_option()
+@create_artifact_option()
 def main(
         personal_access_token,
         build_request_url,
@@ -148,6 +161,7 @@ def main(
         source_branch,
         definition_id,
         archive,
+        artifact,
 ):
     archive_url = None
     if archive is not None:
@@ -169,4 +183,5 @@ def main(
 
     build.wait_for_lock_build(check_period=check_period)
 
-    build.get_lock_build_artifact()
+    if artifact is not None:
+        build.get_lock_build_artifact(artifact)

@@ -82,12 +82,7 @@ class Build:
 
         response = requests.get(artifact_download_url)
 
-        with zipfile.ZipFile(file=io.BytesIO(response.content)) as zip_file:
-            tweaked_members = strip_zip_info_prefixes(
-                prefix=artifact_name,
-                zip_infos=zip_file.infolist(),
-            )
-            zip_file.extractall(members=tweaked_members)
+        artifact.write(response.content)
 
 
 def strip_zip_info_prefixes(prefix, zip_infos):
