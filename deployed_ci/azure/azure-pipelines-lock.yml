@@ -29,8 +29,8 @@ jobs:
     steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: $[ variables.versionSpec ]
-          architecture: $[ variables.architecture ]
+          versionSpec: $(versionSpec)
+          architecture: $(architecture)
       - template: templates/steps/in_archive_from_artifact.yml
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
