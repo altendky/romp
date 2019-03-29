@@ -62,10 +62,13 @@ def main():
         for environment in environments
     ]
     matrix = ', '.join(matrix_entries)
-    print(
+    command = (
         '##vso[task.setVariable variable=JobsToRun;isOutput=True]'
         '[{}]'.format(matrix)
     )
+
+    print(command[2:])
+    print(command)
 
 
 if __name__ == '__main__':
