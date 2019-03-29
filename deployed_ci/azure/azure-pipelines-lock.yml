@@ -17,7 +17,7 @@ jobs:
       archive_url: $(archive_url)
 
   - job: generic_job_name #job_$(platform)_$(versionSpec)_$(architecture)
-    displayName: $[ variables.platform ] $[ variables.versionSpec ] $[ variables.architecture ]
+    displayName: Generic Display Name
     dependsOn:
       - generate_matrix
       - get_input_archive
