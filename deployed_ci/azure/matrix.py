@@ -28,7 +28,7 @@ class Environment:
         return cls(
             platform=platform,
             version=version,
-            architecture=architecture[bit_width]
+            architecture=architecture[int(bit_width)]
         )
 
     def to_matrix_entry(self):
