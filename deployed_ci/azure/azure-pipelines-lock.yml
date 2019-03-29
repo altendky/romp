@@ -16,9 +16,9 @@ jobs:
       job: get_input_archive
       archive_url: $(archive_url)
 
-  - job: job_$(platform)_$(versionSpec)_$(architecture)
+  - job: generic_job_name #job_$(platform)_$(versionSpec)_$(architecture)
     displayName: $(platform) $(versionSpec) $(architecture)
-    dependsOn: |
+    dependsOn:
       generate_matrix
       get_input_archive
     pool:
