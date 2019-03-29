@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -32,42 +33,42 @@ class Environment:
         )
 
     def to_matrix_entry(self):
-        parameters = ', '.join(
-            '"{}": "{}"'.format(*parameter)
-            for parameter in (
-                ('platform', self.platform),
-                ('vmImage', self.vm_image),
-                ('versionSpec', self.version),
-                ('architecture', self.architecture),
-            )
-        )
         return (
-            '"{platform} {version} {architecture}": {{{parameters}}}'.format(
+            '{platform} {version} {architecture}'.format(
                 platform=self.platform,
                 version=self.version,
                 architecture=self.architecture,
-                parameters=parameters,
-            )
+            ),
+            {
+                'platform': self.platform,
+                'vmImage': self.vm_image,
+                'versionSpec': self.version,
+                'architecture': self.architecture,
+            }
         )
 
 
 def main():
     environments = os.environ['ROMP_ENVIRONMENTS']
+
     environments = [
         Environment.from_string(environment_string=environment)
         for environment in environments.split('|')
     ]
-    matrix_entries = [
+
+    matrix_entries = dict(
         environment.to_matrix_entry()
         for environment in environments
-    ]
-    matrix = ', '.join(matrix_entries)
-    command = (
-        '##vso[task.setVariable variable=JobsToRun;isOutput=True]'
-        '{{{}}}'.format(matrix)
     )
 
-    print(command[2:])
+    json_matrix = json.dumps(matrix_entries)
+
+    command = (
+        '##vso[task.setVariable variable=JobsToRun;isOutput=True]'
+        + json_matrix
+    )
+
+    print(command.lstrip('#'))
     print(command)
 
 

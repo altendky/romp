@@ -17,8 +17,8 @@ jobs:
       job: get_input_archive
       archive_url: $(archive_url)
 
-  - job: generic_job_name #job_$(platform)_$(versionSpec)_$(architecture)
-    displayName: Generic Display Name
+  - job: romp_on
+    displayName: romp on
     dependsOn:
       - generate_matrix
       - get_input_archive
