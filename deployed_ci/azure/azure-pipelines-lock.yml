@@ -19,8 +19,8 @@ jobs:
   - job: generic_job_name #job_$(platform)_$(versionSpec)_$(architecture)
     displayName: $(platform) $(versionSpec) $(architecture)
     dependsOn:
-      generate_matrix
-      get_input_archive
+      - generate_matrix
+      - get_input_archive
     pool:
       vmImage: $(vmImage)
     strategy:
