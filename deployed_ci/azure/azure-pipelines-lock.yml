@@ -10,6 +10,7 @@ jobs:
     steps:
       - bash: |
           python deployed_ci/azure/matrix.py
+        name: generate_matrix
 
   - template: templates/jobs/get_input_archive.yml
     parameters:
@@ -24,7 +25,7 @@ jobs:
     pool:
       vmImage: $[ variables.vmImage ]
     strategy:
-      matrix: $[ dependencies.jobDecider.outputs['JobsToRun'] ]
+      matrix: $[ dependencies.generate_matrix.generate_matrix.outputs['JobsToRun'] ]
     steps:
       - task: UsePythonVersion@0
         inputs:
