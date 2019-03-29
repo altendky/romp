@@ -64,7 +64,7 @@ def main():
     matrix = ', '.join(matrix_entries)
     command = (
         '##vso[task.setVariable variable=JobsToRun;isOutput=True]'
-        '[{}]'.format(matrix)
+        '{{{}}}'.format(matrix)
     )
 
     print(command[2:])
