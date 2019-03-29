@@ -17,19 +17,19 @@ jobs:
       archive_url: $(archive_url)
 
   - job: generic_job_name #job_$(platform)_$(versionSpec)_$(architecture)
-    displayName: $(platform) $(versionSpec) $(architecture)
+    displayName: $[ variables.platform ] $[ variables.versionSpec ] $[ variables.architecture ]
     dependsOn:
       - generate_matrix
       - get_input_archive
     pool:
-      vmImage: $(vmImage)
+      vmImage: $[ variables.vmImage ]
     strategy:
       matrix: $[ dependencies.jobDecider.outputs['JobsToRun'] ]
     steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: $(versionSpec)
-          architecture: $(architecture)
+          versionSpec: $[ variables.versionSpec ]
+          architecture: $[ variables.architecture ]
       - template: templates/steps/in_archive_from_artifact.yml
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
