@@ -4,5 +4,5 @@ steps:
       artifactName: 'input'
       targetPath: $(System.DefaultWorkingDirectory)
   - bash: |
-      tar --extract --verbose --file input/input.tar.gz
+      tar --extract --verbose --file input.tar.gz
     displayName: Extract input

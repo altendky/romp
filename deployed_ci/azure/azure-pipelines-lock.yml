@@ -6,31 +6,43 @@ variables:
   environments: ${ROMP_ENVIRONMENTS}
 
 jobs:
+  - job: generate_matrix
+    steps:
+      - bash: |
+          python deployed_ci/azure/matrix.py
+        name: generate_matrix
+
   - template: templates/jobs/get_input_archive.yml
     parameters:
       job: get_input_archive
       archive_url: $(archive_url)
 
-  - template: templates/jobs/run_command.yml
-    parameters:
-      platform: Linux
-      vmImage: 'ubuntu-16.04'
-      dependsOn: get_input_archive
-      command: $(command)
-      environments: $(environments)
-
-  - template: templates/jobs/run_command.yml
-    parameters:
-      platform: macOS
-      vmImage: 'macOS-10.13'
-      dependsOn: get_input_archive
-      command: $(command)
-      environments: $(environments)
-
-  - template: templates/jobs/run_command.yml
-    parameters:
-      platform: Windows
-      vmImage: 'vs2017-win2016'
-      dependsOn: get_input_archive
-      command: $(command)
-      environments: $(environments)
+  - job: romp_on
+    displayName: romp on
+    dependsOn:
+      - generate_matrix
+      - get_input_archive
+    pool:
+      vmImage: $[ variables.vmImage ]
+    strategy:
+      matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: $(versionSpec)
+          architecture: $(architecture)
+      - template: templates/steps/in_archive_from_artifact.yml
+      - bash: |
+          python -c 'import sys; print(sys.version); print(sys.platform)'
+        displayName: Report Python version
+      - bash: |
+          eval $(command)
+        displayName: Run Command
+      - task: CopyFiles@2
+        inputs:
+          contents: 'requirements/*.txt'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: lock_files
