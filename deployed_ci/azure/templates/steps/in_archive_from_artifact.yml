@@ -5,5 +5,5 @@ steps:
       targetPath: $(System.DefaultWorkingDirectory)
   - bash: |
       ls -lR
-      tar --extract --verbose --file input/input.tar.gz
+      tar --extract --verbose --file input.tar.gz
     displayName: Extract input
