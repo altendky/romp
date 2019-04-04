@@ -10,7 +10,7 @@ jobs:
     steps:
       - bash: |
           python deployed_ci/azure/matrix.py
-        name: generate_matrix
+        name: Generate Matrix
 
   - template: templates/jobs/get_input_archive.yml
     parameters:
