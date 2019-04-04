@@ -67,7 +67,7 @@ def create_username_option(
     }
 
     try:
-        kwargs['default'] = getpass.getuser(),
+        kwargs['default'] = getpass.getuser()
     except ImportError:
         kwargs['required'] = True
 
