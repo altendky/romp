@@ -8,7 +8,7 @@ def test_all():
             sys.executable,
             '-m', 'romp',
             '--command', 'python -c "import sys; print(sys.version)"',
-            '--environments', 'Linux-3.7-64|macOS-3.5-64|Windows-3.4-32',
+            '--environments', 'Linux-3.7-64|macOS-3.5-64',
             # ENVVAR '--personal-access-token', '',
             # ENVVAR '--build-request-url', '',
             # ENVVAR '--username', '',
