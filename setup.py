@@ -57,8 +57,7 @@ setuptools.setup(
     extras_require={
         'dev': [
             'gitignoreio',
-            *extras_require_test,
-        ],
+        ] + extras_require_test,
         'test': extras_require_test,
     },
 )
