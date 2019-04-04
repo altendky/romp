@@ -53,7 +53,7 @@ def main():
         '{}-{}-{}'.format(platform, version, architecture)
         for platform in vm_images
         for version in ('2.7', '3.4', '3.5', '3.6', '3.7')
-        for architecture in architectures
+        for architecture in (64,)
     )
 
     environments = [
