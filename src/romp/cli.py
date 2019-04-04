@@ -61,11 +61,19 @@ def create_command_option(
 def create_username_option(
         envvar='ROMP_USERNAME',
 ):
+    kwargs = {
+        'envvar': envvar,
+        'help': 'Username for build URL authentication',
+    }
+
+    try:
+        kwargs['default'] = getpass.getuser(),
+    except ImportError:
+        kwargs['required'] = True
+
     return create_option(
         '--username',
-        default=getpass.getuser(),
-        envvar=envvar,
-        help='Username for build URL authentication',
+        **kwargs
     )
 
 
