@@ -4,23 +4,23 @@ import os
 import sys
 
 
-vm_image = {
-    'Linux': 'ubuntu-16.04',
-    'macOS': 'macOS-10.13',
-    'Windows': 'vs2017-win2016',
-}
+vm_images = collections.OrderedDict(
+    ('Linux', 'ubuntu-16.04'),
+    ('macOS', 'macOS-10.13'),
+    ('Windows', 'vs2017-win2016'),
+)
 
 
-architecture = {
-    32: 'x86',
-    64: 'x64',
-}
+architectures = collections.OrderedDict(
+    (32, 'x86'),
+    (64, 'x64'),
+)
 
 
 class Environment:
     def __init__(self, platform, version, architecture):
         self.platform = platform
-        self.vm_image = vm_image[platform]
+        self.vm_image = vm_images[platform]
         self.version = version
         self.architecture = architecture
 
@@ -30,7 +30,7 @@ class Environment:
         return cls(
             platform=platform,
             version=version,
-            architecture=architecture[int(bit_width)]
+            architecture=architectures[int(bit_width)]
         )
 
     def to_matrix_entry(self):

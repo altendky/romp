@@ -3,17 +3,17 @@ import json
 import sys
 
 
-vm_images = {
-    'Linux': 'ubuntu-16.04',
-    'macOS': 'macOS-10.13',
-    'Windows': 'vs2017-win2016',
-}
+vm_images = collections.OrderedDict(
+    ('Linux', 'ubuntu-16.04'),
+    ('macOS', 'macOS-10.13'),
+    ('Windows', 'vs2017-win2016'),
+)
 
 
-architectures = {
-    32: 'x86',
-    64: 'x64',
-}
+architectures = collections.OrderedDict(
+    (32, 'x86'),
+    (64, 'x64'),
+)
 
 
 class Environment:
