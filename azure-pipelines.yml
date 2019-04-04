@@ -18,6 +18,7 @@ jobs:
     pool:
       vmImage: $[ variables.vmImage ]
     strategy:
+      maxParallel: 3
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
       - task: UsePythonVersion@0
