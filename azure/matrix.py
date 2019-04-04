@@ -49,8 +49,8 @@ class Environment:
 
 
 def main():
-    environments = ''.join(
-        '|{}-{}-{}'.format(platform, version, architecture)
+    environments = '|'.join(
+        '{}-{}-{}'.format(platform, version, architecture)
         for platform in vm_images
         for version in ('2.7', '3.4', '3.5', '3.6', '3.7')
         for architecture in architectures
@@ -74,6 +74,7 @@ def main():
     )
 
     print(command.lstrip('#'))
+    print(json.dumps(matrix_entries, indent=4))
     print(command)
 
 
