@@ -24,7 +24,6 @@ jobs:
         inputs:
           versionSpec: $(versionSpec)
           architecture: $(architecture)
-      - template: templates/steps/in_archive_from_artifact.yml
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
