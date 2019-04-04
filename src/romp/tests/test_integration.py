@@ -3,7 +3,7 @@ import sys
 
 
 def test_all():
-    subprocess.run(
+    subprocess.check_call(
         [
             sys.executable,
             '-m', 'romp',
@@ -18,5 +18,4 @@ def test_all():
             # skip '--archive', '',
             # skip '--artifact', '',
         ],
-        check=True,
     )
