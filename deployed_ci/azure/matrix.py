@@ -1,3 +1,4 @@
+import collections
 import json
 import os
 import sys
@@ -56,7 +57,7 @@ def main():
         for environment in environments.split('|')
     ]
 
-    matrix_entries = dict(
+    matrix_entries = collections.OrderedDict(
         environment.to_matrix_entry()
         for environment in environments
     )
