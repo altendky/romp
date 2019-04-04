@@ -17,7 +17,7 @@ jobs:
     displayName: Get input archive
     steps:
       - bash: |
-          if [[ -z "${{ parameters.archive_url }}" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else curl --silent --show-error "$(archive_url)" --output input.tar.gz; fi
+          if [[ -z "$(archive_url)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else curl --silent --show-error "$(archive_url)" --output input.tar.gz; fi
         displayName: Get input archive
       - task: PublishPipelineArtifact@0
         inputs:
