@@ -43,7 +43,8 @@ class Environment:
                 'vmImage': self.vm_image,
                 'versionSpec': self.version,
                 'architecture': self.architecture,
-            }
+                'TOXENV': 'py' + self.version.replace('.', ''),
+            },
         )
 
 

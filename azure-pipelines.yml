@@ -37,6 +37,7 @@ jobs:
           ROMP_USERNAME: $(ROMP_USERNAME)
           ROMP_DEFINITION_ID: 5
           ROMP_SOURCE_BRANCH: $(Build.SourceBranch)
+          TOXENV: $[ variables.TOXENV ]
 
   - job: build_and_deploy
     displayName: Build And Deploy
