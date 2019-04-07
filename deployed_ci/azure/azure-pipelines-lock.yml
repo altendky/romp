@@ -1,4 +1,5 @@
 trigger: none
+pr: none
 
 variables:
   archive_url: ${ROMP_ARCHIVE_URL}
