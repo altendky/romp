@@ -21,6 +21,6 @@ Run on multiple platforms
    :alt: codecov coverage status
    :target: https://codecov.io/gh/altendky/romp
 
-.. |GitHub| image:: https://img.shields.io/github/last-commit/altendky/romp/master.svg
+.. |GitHub| image:: https://img.shields.io/github/last-commit/altendky/romp/develop.svg
    :alt: source on GitHub
    :target: https://github.com/altendky/romp
