@@ -44,6 +44,8 @@ jobs:
       - bash: |
           tox -e codecov
         displayName: codecov
+        env:
+          CODECOV_TOKEN: $(CODECOV_TOKEN)
 
   - job: build_and_deploy
     displayName: Build And Deploy
