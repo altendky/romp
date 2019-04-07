@@ -41,6 +41,9 @@ jobs:
           ROMP_DEFINITION_ID: 5
           ROMP_SOURCE_BRANCH: $(Build.SourceBranch)
           TOXENV: $[ variables.TOXENV ]
+      - bash: |
+          tox -e codecov
+        displayName: codecov
 
   - job: build_and_deploy
     displayName: Build And Deploy
