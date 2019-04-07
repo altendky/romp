@@ -1,4 +1,5 @@
 trigger: none
+pr: none
 
 variables:
   archive_url: ${ROMP_ARCHIVE_URL}
@@ -7,15 +8,22 @@ variables:
 
 jobs:
   - job: generate_matrix
+    displayName: Generate Matrix
     steps:
       - bash: |
           python deployed_ci/azure/matrix.py
         name: generate_matrix
 
-  - template: templates/jobs/get_input_archive.yml
-    parameters:
-      job: get_input_archive
-      archive_url: $(archive_url)
+  - job: get_input_archive
+    displayName: Get input archive
+    steps:
+      - bash: |
+          if [[ -z "$(archive_url)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else curl --silent --show-error "$(archive_url)" --output input.tar.gz; fi
+        displayName: Get input archive
+      - task: PublishPipelineArtifact@0
+        inputs:
+          artifactName: 'input'
+          targetPath: '$(System.DefaultWorkingDirectory)/input.tar.gz'
 
   - job: romp_on
     displayName: romp on
@@ -31,7 +39,13 @@ jobs:
         inputs:
           versionSpec: $(versionSpec)
           architecture: $(architecture)
-      - template: templates/steps/in_archive_from_artifact.yml
+      - task: DownloadPipelineArtifact@0
+        inputs:
+          artifactName: 'input'
+          targetPath: $(System.DefaultWorkingDirectory)
+      - bash: |
+          tar --extract --verbose --file input.tar.gz
+        displayName: Extract input
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version

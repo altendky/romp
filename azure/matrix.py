@@ -1,6 +1,5 @@
 import collections
 import json
-import os
 import sys
 
 
@@ -45,12 +44,18 @@ class Environment:
                 'vmImage': self.vm_image,
                 'versionSpec': self.version,
                 'architecture': self.architecture,
-            }
+                'TOXENV': 'py' + self.version.replace('.', ''),
+            },
         )
 
 
 def main():
-    environments = os.environ['ROMP_ENVIRONMENTS']
+    environments = '|'.join(
+        '{}-{}-{}'.format(platform, version, architecture)
+        for platform in vm_images
+        for version in ('2.7', '3.4', '3.5', '3.6', '3.7')
+        for architecture in (64,)
+    )
 
     environments = [
         Environment.from_string(environment_string=environment)
@@ -70,6 +75,7 @@ def main():
     )
 
     print(command.lstrip('#'))
+    print(json.dumps(matrix_entries, indent=4))
     print(command)
 
 

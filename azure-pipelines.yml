@@ -1,12 +1,55 @@
 trigger:
   branches:
-    include: ['*']
+    include: ['develop']
   tags:
     include: ['*']
 
 jobs:
+  - job: generate_matrix
+    displayName: Generate Matrix
+    steps:
+      - bash: |
+          python azure/matrix.py
+        name: generate_matrix
+
+  - job: test
+    displayName: Test
+    dependsOn: generate_matrix
+    pool:
+      vmImage: $[ variables.vmImage ]
+    strategy:
+      maxParallel: 4
+      matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: $(versionSpec)
+          architecture: $(architecture)
+      - bash: |
+          python -c 'import sys; print(sys.version); print(sys.platform)'
+        displayName: Report Python version
+      - bash: |
+          python -m pip install tox
+        displayName: Install tox
+      - bash: |
+          tox
+        displayName: tox
+        env:
+          ROMP_PERSONAL_ACCESS_TOKEN: $(ROMP_PERSONAL_ACCESS_TOKEN)
+          ROMP_BUILD_REQUEST_URL: https://dev.azure.com/altendky/romp-on/_apis/build/builds?api-version=5.0
+          ROMP_USERNAME: $(ROMP_USERNAME)
+          ROMP_DEFINITION_ID: 5
+          ROMP_SOURCE_BRANCH: $(Build.SourceBranch)
+          TOXENV: $[ variables.TOXENV ]
+      - bash: |
+          tox -e codecov
+        displayName: codecov
+        env:
+          CODECOV_TOKEN: $(CODECOV_TOKEN)
+
   - job: build_and_deploy
     displayName: Build And Deploy
+    dependsOn: test
     pool:
       vmImage: 'ubuntu-16.04'
     steps:

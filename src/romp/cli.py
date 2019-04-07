@@ -7,18 +7,14 @@ import romp._core
 
 
 @functools.wraps(click.option)
-def create_option(*args, envvar, help, show_default=True, **kwargs):
-    help = help.strip()
-    help += ' (${})'.format(envvar)
-    help = help.strip()
+def create_option(*args, **kwargs):
+    kwargs['help'] = kwargs['help'].strip()
+    kwargs['help'] += ' (${})'.format(kwargs['envvar'])
+    kwargs['help'] = kwargs['help'].strip()
 
-    return click.option(
-        *args,
-        envvar=envvar,
-        help=help,
-        show_default=show_default,
-        **kwargs,
-    )
+    kwargs.setdefault('show_default', True)
+
+    return click.option(*args, **kwargs)
 
 
 def create_personal_access_token_option(
@@ -65,11 +61,19 @@ def create_command_option(
 def create_username_option(
         envvar='ROMP_USERNAME',
 ):
+    kwargs = {
+        'envvar': envvar,
+        'help': 'Username for build URL authentication',
+    }
+
+    try:
+        kwargs['default'] = getpass.getuser()
+    except ImportError:
+        kwargs['required'] = True
+
     return create_option(
         '--username',
-        default=getpass.getuser(),
-        envvar=envvar,
-        help='Username for build URL authentication',
+        **kwargs
     )
 
 

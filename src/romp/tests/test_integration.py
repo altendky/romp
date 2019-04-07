@@ -1,0 +1,21 @@
+import subprocess
+import sys
+
+
+def test_all():
+    subprocess.check_call(
+        [
+            sys.executable,
+            '-m', 'romp',
+            '--command', 'python -c "import sys; print(sys.version)"',
+            '--environments', 'Linux-3.7-64|macOS-3.5-64',
+            # ENVVAR '--personal-access-token', '',
+            # ENVVAR '--build-request-url', '',
+            # ENVVAR '--username', '',
+            # default '--check-period', '',
+            # ENVVAR '--source-branch, '',
+            # ENVVAR '--definition-id', '',
+            # skip '--archive', '',
+            # skip '--artifact', '',
+        ],
+    )
