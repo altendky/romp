@@ -1,7 +1,7 @@
 [run]
 branch = True
 source =
-    exttr
+    romp
 
 [report]
 show_missing = True
