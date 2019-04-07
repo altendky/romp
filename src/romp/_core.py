@@ -19,9 +19,7 @@ class Build:
     def from_response_json(cls, response_json):
         id = response_json['id']
         url = response_json['url']
-        human_url = (
-            'https://dev.azure.com/altendky/romp/_build/results?buildId={}'
-        ).format(id)
+        human_url = response_json['_links']['web']['href']
 
         return cls(id=id, url=url, human_url=human_url)
 
