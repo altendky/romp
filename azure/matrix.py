@@ -71,6 +71,15 @@ class Environment:
 
             return 'pypy'
 
+    def tox_env(self):
+        env = 'py'
+        if self.interpreter == 'PyPy':
+            env += 'py'
+
+        env += self.version.replace('.', '')
+
+        return env
+
     def to_matrix_entry(self):
         return (
             '{platform} {interpreter} {version} {architecture}'.format(
@@ -93,7 +102,7 @@ class Environment:
                     self.architecture,
                 ), ''),
                 'extracter': extracters[self.platform],
-                'TOXENV': 'py' + self.version.replace('.', ''),
+                'TOXENV': self.tox_env(),
             },
         )
 
