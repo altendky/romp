@@ -8,7 +8,11 @@ def test_all():
             sys.executable,
             '-m', 'romp',
             '--command', 'python -c "import sys; print(sys.version)"',
-            '--environments', 'Linux-3.7-64|macOS-3.5-64',
+            '--environments', '|'.join((
+                'Linux-CPython-3.7-64',
+                'macOS-CPython-3.5-64',
+                'Linux-PyPy-3.5-64',
+            )),
             # ENVVAR '--personal-access-token', '',
             # ENVVAR '--build-request-url', '',
             # ENVVAR '--username', '',
