@@ -79,6 +79,8 @@ class Environment:
 
         env += self.version.replace('.', '')
 
+        return env
+
     def to_matrix_entry(self):
         return (
             '{platform} {interpreter} {version} {architecture}'.format(
