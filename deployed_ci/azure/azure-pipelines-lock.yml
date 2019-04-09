@@ -35,10 +35,7 @@ jobs:
     strategy:
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: $(versionSpec)
-          architecture: $(architecture)
+      - template: templates/tasks/get_python.yml
       - task: DownloadPipelineArtifact@0
         inputs:
           artifactName: 'input'

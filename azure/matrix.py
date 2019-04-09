@@ -10,6 +10,16 @@ vm_images = collections.OrderedDict((
 ))
 
 
+interpreters = collections.OrderedDict((
+    ('CPython', 'CPython'),
+    ('PyPy', 'PyPy'),
+))
+
+versions = {
+    'CPython': ('2.7', '3.4', '3.5', '3.6', '3.7'),
+    'PyPy': ('2.7', '3.5'),
+}
+
 architectures = collections.OrderedDict((
     (32, 'x86'),
     (64, 'x64'),
@@ -17,30 +27,36 @@ architectures = collections.OrderedDict((
 
 
 class Environment:
-    def __init__(self, platform, version, architecture):
+    def __init__(self, platform, interpreter, version, architecture):
         self.platform = platform
         self.vm_image = vm_images[platform]
+        self.interpreter = interpreter
         self.version = version
         self.architecture = architecture
 
     @classmethod
     def from_string(cls, environment_string):
-        platform, version, bit_width = environment_string.split('-')
+        platform, interpreter, version, bit_width = (
+            environment_string.split('-')
+        )
         return cls(
             platform=platform,
+            interpreter=interpreter,
             version=version,
             architecture=architectures[int(bit_width)]
         )
 
     def to_matrix_entry(self):
         return (
-            '{platform} {version} {architecture}'.format(
+            '{platform} {interpreter} {version} {architecture}'.format(
                 platform=self.platform,
+                interpreter=self.interpreter,
                 version=self.version,
                 architecture=self.architecture,
             ),
             {
                 'platform': self.platform,
+                'interpreter': self.interpreter,
                 'vmImage': self.vm_image,
                 'versionSpec': self.version,
                 'architecture': self.architecture,
@@ -51,9 +67,10 @@ class Environment:
 
 def main():
     environments = '|'.join(
-        '{}-{}-{}'.format(platform, version, architecture)
+        '-'.join((platform, interpreter, version, str(architecture)))
         for platform in vm_images
-        for version in ('2.7', '3.4', '3.5', '3.6', '3.7')
+        for interpreter in interpreters
+        for version in versions[interpreter]
         for architecture in (64,)
     )
 

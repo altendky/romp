@@ -21,10 +21,7 @@ jobs:
       maxParallel: 4
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: $(versionSpec)
-          architecture: $(architecture)
+      - template: deployed_ci/azure/templates/tasks/get_python.yml
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
