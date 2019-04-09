@@ -40,6 +40,10 @@ steps:
     displayName: 'Check for PyPy'
     condition: eq(variables.interpreter, 'PyPy')
   - bash: |
+      $(python_binary) deployed_ci/azure/get_python.py --python-binary "$(python_binary)" --target-name "pypy" --version $(variables.versionSpec)
+    displayName: 'Alias PyPy'
+    condition: eq(variables.interpreter, 'PyPy')
+  - bash: |
       curl --output pypy.tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
       $(python_binary) pypy.tmp/get-pip.py
     displayName: 'Get PIP'
