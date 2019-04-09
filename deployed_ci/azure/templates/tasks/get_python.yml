@@ -3,17 +3,17 @@ steps:
     inputs:
       versionSpec: $(versionSpec)
       architecture: $(architecture)
-    condition: eq($[ variables.interpreter ], 'CPython')
+    condition: eq(variables.interpreter, 'CPython')
 
   - bash: |
       echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin:$(PATH)"
-    condition: and(eq( variables['Agent.OS'], 'Linux' ), eq($[ variables.interpreter ], 'PyPy'))
+    condition: and(eq( variables['Agent.OS'], 'Linux' ), eq(variables.interpreter, 'PyPy'))
   - bash: |
       echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin:$(PATH)"
-    condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq($[ variables.interpreter ], 'PyPy'))
+    condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq(variables.interpreter, 'PyPy'))
   - bash: |
       echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)\pypy.tmp\pypy;$(PATH)"
-    condition: and(eq( variables['Agent.OS'], 'Windows_NT' ), eq($[ variables.interpreter ], 'PyPy'))
+    condition: and(eq( variables['Agent.OS'], 'Windows_NT' ), eq(variables.interpreter, 'PyPy'))
   - bash: |
       mkdir pypy.tmp
       cd pypy.tmp
@@ -23,14 +23,14 @@ steps:
       mv ./* pypy
       cd ..
     displayName: 'Get PyPy'
-    condition: eq($[ variables.interpreter ], 'PyPy')
+    condition: eq(variables.interpreter, 'PyPy')
   - bash: |
       type $(pypy_binary)
       $(pypy_binary) --version
     displayName: 'Check for PyPy'
-    condition: eq($[ variables.interpreter ], 'PyPy')
+    condition: eq(variables.interpreter, 'PyPy')
   - bash: |
       curl --output pypy.tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
       $(pypy_binary) pypy.tmp/get-pip.py
     displayName: 'Get PIP'
-    condition: eq($[ variables.interpreter ], 'PyPy')
+    condition: eq(variables.interpreter, 'PyPy')
