@@ -86,12 +86,12 @@ class Environment:
                 'versionSpec': self.version,
                 'architecture': self.architecture,
                 'python_binary': self.python_binary(),
-                'python_url': urls[(
+                'python_url': urls.get((
                     self.platform,
                     self.interpreter,
                     self.version,
                     self.architecture,
-                )],
+                ), ''),
                 'extracter': extracters[self.platform],
                 'TOXENV': 'py' + self.version.replace('.', ''),
             },
@@ -104,7 +104,21 @@ def main():
         for platform in vm_images
         for interpreter in interpreters
         for version in versions[interpreter]
-        for architecture in (64,)
+        for architecture in (32, 64)
+        if not (
+            (
+                architecture == 32
+                and (
+                    platform != 'Windows'
+                    or interpreter != 'PyPy'
+                )
+            )
+            or (
+                platform == 'Windows'
+                and interpreter == 'PyPy'
+                and architecture == 64
+            )
+        )
     )
 
     environments = [
