@@ -25,12 +25,12 @@ steps:
     displayName: 'Get PyPy'
     condition: eq(variables.interpreter, 'PyPy')
   - bash: |
-      type $(pypy_binary)
-      $(pypy_binary) --version
+      type $(python_binary)
+      $(python_binary) --version
     displayName: 'Check for PyPy'
     condition: eq(variables.interpreter, 'PyPy')
   - bash: |
       curl --output pypy.tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
-      $(pypy_binary) pypy.tmp/get-pip.py
+      $(python_binary) pypy.tmp/get-pip.py
     displayName: 'Get PIP'
     condition: eq(variables.interpreter, 'PyPy')

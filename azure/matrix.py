@@ -46,6 +46,16 @@ class Environment:
             architecture=architectures[int(bit_width)]
         )
 
+    def python_binary(self):
+        if self.interpreter == 'CPython':
+            return 'python'
+
+        if self.interpreter == 'PyPy':
+            if self.version.startswith('3'):
+                return 'pypy3'
+
+            return 'pypy'
+
     def to_matrix_entry(self):
         return (
             '{platform} {interpreter} {version} {architecture}'.format(
@@ -60,6 +70,7 @@ class Environment:
                 'vmImage': self.vm_image,
                 'versionSpec': self.version,
                 'architecture': self.architecture,
+                'python_binary': self.python_binary(),
                 'TOXENV': 'py' + self.version.replace('.', ''),
             },
         )
