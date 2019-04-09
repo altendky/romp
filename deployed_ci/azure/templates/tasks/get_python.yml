@@ -17,8 +17,8 @@ steps:
   - bash: |
       mkdir pypy.tmp
       cd pypy.tmp
-      curl --location --output archive $(url)
-      ${{ parameters.extracter }} archive
+      curl --location --output archive $(python_url)
+      $(extracter) archive
       rm archive
       mv ./* pypy
       cd ..

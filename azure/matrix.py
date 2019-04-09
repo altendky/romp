@@ -25,6 +25,21 @@ architectures = collections.OrderedDict((
     (64, 'x64'),
 ))
 
+urls = collections.OrderedDict((
+    (('Linux', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-linux64.tar.bz2'),
+    (('Linux', 'PyPy', '3.5', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-linux64.tar.bz2'),
+    (('macOS', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-osx64.tar.bz2'),
+    (('macOS', 'PyPy', '3.5', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-osx64.tar.bz2'),
+    (('Windows', 'PyPy', '2.7', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-win32.zip'),
+    (('Windows', 'PyPy', '3.5', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-win32.zip'),
+))
+
+extracters = {
+    'Linux': 'tar -xvf',
+    'macOS': 'tar -xvf',
+    'Windows': 'unzip',
+}
+
 
 class Environment:
     def __init__(self, platform, interpreter, version, architecture):
@@ -71,6 +86,13 @@ class Environment:
                 'versionSpec': self.version,
                 'architecture': self.architecture,
                 'python_binary': self.python_binary(),
+                'python_url': urls[(
+                    self.platform,
+                    self.interpreter,
+                    self.version,
+                    self.architecture,
+                )],
+                'extracter': extracters[self.platform],
                 'TOXENV': 'py' + self.version.replace('.', ''),
             },
         )
