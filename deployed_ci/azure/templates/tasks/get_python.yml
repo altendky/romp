@@ -6,14 +6,24 @@ steps:
     condition: eq(variables.interpreter, 'CPython')
 
   - bash: |
+      echo $PATH
+    displayName: Report Path
+  - bash: |
       echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin:$(PATH)"
+    displayName: Set $PATH - Linux PyPy
     condition: and(eq( variables['Agent.OS'], 'Linux' ), eq(variables.interpreter, 'PyPy'))
   - bash: |
       echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin:$(PATH)"
+    displayName: Set $PATH - macOS PyPy
     condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq(variables.interpreter, 'PyPy'))
   - bash: |
       echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)\pypy.tmp\pypy;$(PATH)"
+    displayName: Set $PATH - Windows PyPy
     condition: and(eq( variables['Agent.OS'], 'Windows_NT' ), eq(variables.interpreter, 'PyPy'))
+  - bash: |
+      echo $PATH
+    displayName: Report Path
+
   - bash: |
       mkdir pypy.tmp
       cd pypy.tmp
