@@ -44,7 +44,7 @@ steps:
     displayName: 'Alias PyPy'
     condition: eq(variables.interpreter, 'PyPy')
     env:
-      VERSION_SPEC: $[ variables.versionSpec ]
+      VERSION_SPEC: $(variables.versionSpec)
   - bash: |
       curl --output pypy.tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
       $(python_binary) pypy.tmp/get-pip.py
