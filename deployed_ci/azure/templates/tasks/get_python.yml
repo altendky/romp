@@ -45,19 +45,19 @@ steps:
     displayName: Alias PyPy - Linux
     condition: and(eq( variables['Agent.OS'], 'Linux' ), eq(variables.interpreter, 'PyPy'))
     env:
-      VERSION_SPEC: $(variables.versionSpec)
+      VERSION_SPEC: $(versionSpec)
   - bash: |
       $(python_binary) deployed_ci/azure/get_python.py --python-binary "$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin/$(python_binary)" --target-name "pypy" --version ${VERSION_SPEC}
     displayName: Alias PyPy - macOS
     condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq(variables.interpreter, 'PyPy'))
     env:
-      VERSION_SPEC: $(variables.versionSpec)
+      VERSION_SPEC: $(versionSpec)
   - bash: |
       $(python_binary) deployed_ci/azure/get_python.py --python-binary "$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/$(python_binary)" --target-name "pypy" --version ${VERSION_SPEC}
     displayName: Alias PyPy - Windows
     condition: and(eq( variables['Agent.OS'], 'Windows_NT' ), eq(variables.interpreter, 'PyPy'))
     env:
-      VERSION_SPEC: $(variables.versionSpec)
+      VERSION_SPEC: $(versionSpec)
 
   - bash: |
       curl --output pypy.tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
