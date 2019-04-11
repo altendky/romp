@@ -4,6 +4,9 @@ import shutil
 import sys
 
 
+shutil_error = getattr(shutil, 'SameFileError', shutil.Error)
+
+
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -40,7 +43,7 @@ def main():
 
         try:
             shutil.copy(args.python_binary, target)
-        except shutil.SameFileError:
+        except shutil_error:
             print('         same file')
 
 
