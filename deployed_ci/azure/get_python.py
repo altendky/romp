@@ -26,8 +26,8 @@ def main():
     _, extension = os.path.splitext(args.python_binary)
     version = args.version.split('.')
 
-    for i in range(len(version)):
-        version_text = '.'.join(version[:i + 1])
+    for i in range(len(version) + 1):
+        version_text = '.'.join(version[:i])
         target = os.path.join(
             path,
             args.target_name + version_text + extension,
@@ -37,7 +37,11 @@ def main():
             args.python_binary,
             target,
         ))
-        shutil.copy(args.python_binary, target)
+
+        try:
+            shutil.copy(args.python_binary, target)
+        except shutil.SameFileError:
+            print('         same file')
 
 
 sys.exit(main())
