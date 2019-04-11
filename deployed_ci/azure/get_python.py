@@ -26,8 +26,8 @@ def main():
     _, extension = os.path.splitext(args.python_binary)
     version = args.version.split('.')
 
-    for i in range(len(version) + 1):
-        version_text = '.'.join(version[:i])
+    for i in range(len(version)):
+        version_text = '.'.join(version[:i + 1])
         target = os.path.join(
             path,
             args.target_name + version_text + extension,
