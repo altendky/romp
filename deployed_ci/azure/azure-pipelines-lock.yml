@@ -11,8 +11,10 @@ jobs:
     displayName: Generate Matrix
     steps:
       - bash: |
-          python deployed_ci/azure/matrix.py
+          python deployed_ci/azure/matrix.py --environments ${ROMP_ENVIRONMENTS}
         name: generate_matrix
+        env:
+          ROMP_ENVIRONMENTS: $(ROMP_ENVIRONMENTS)
 
   - job: get_input_archive
     displayName: Get input archive
