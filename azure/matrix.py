@@ -63,13 +63,17 @@ class Environment:
 
     def python_binary(self):
         if self.interpreter == 'CPython':
-            return 'python'
+            binary = 'python'
+        elif self.interpreter == 'PyPy':
+            binary = 'pypy'
 
-        if self.interpreter == 'PyPy':
             if self.version.startswith('3'):
-                return 'pypy3'
+                binary += '3'
 
-            return 'pypy'
+        if self.platform == 'Windows':
+            binary += '.exe'
+
+        return binary
 
     def tox_env(self):
         env = 'py'
