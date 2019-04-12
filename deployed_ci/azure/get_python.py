@@ -29,7 +29,7 @@ def main():
     _, extension = os.path.splitext(args.python_binary)
     version = args.version.split('.')
 
-    targets = [os.path.join(path, 'python')]
+    targets = [os.path.join(path, 'python' + extension)]
 
     for i in range(len(version) + 1):
         version_text = '.'.join(version[:i])
