@@ -135,12 +135,6 @@ all_environments = '|'.join(
 )
 
 
-all_environments = [
-    Environment.from_string(environment_string=environment)
-    for environment in all_environments.split('|')
-]
-
-
 def main():
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
@@ -154,9 +148,14 @@ def main():
 
     args = parser.parse_args()
 
+    environments = [
+        Environment.from_string(environment_string=environment)
+        for environment in args.environments.split('|')
+    ]
+
     matrix_entries = collections.OrderedDict(
         environment.to_matrix_entry()
-        for environment in args.environments
+        for environment in environments
     )
 
     json_matrix = json.dumps(matrix_entries)
