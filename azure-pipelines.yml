@@ -23,10 +23,10 @@ jobs:
     steps:
       - template: deployed_ci/azure/templates/tasks/get_python.yml
       - bash: |
-          $(python_binary) -c 'import sys; print(sys.version); print(sys.platform)'
+          python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
       - bash: |
-          $(python_binary) -m pip install tox
+          python -m pip install tox
         displayName: Install tox
       - bash: |
           tox
