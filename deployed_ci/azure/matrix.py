@@ -1,6 +1,6 @@
+import argparse
 import collections
 import json
-import os
 import sys
 
 
@@ -112,17 +112,51 @@ class Environment:
         )
 
 
-def main():
-    environments = os.environ['ROMP_ENVIRONMENTS']
+all_environments = '|'.join(
+    '-'.join((platform, interpreter, version, str(architecture)))
+    for platform in vm_images
+    for interpreter in interpreters
+    for version in versions[interpreter]
+    for architecture in (32, 64)
+    if not (
+        (
+            architecture == 32
+            and (
+                platform != 'Windows'
+                or interpreter != 'PyPy'
+            )
+        )
+        or (
+            platform == 'Windows'
+            and interpreter == 'PyPy'
+            and architecture == 64
+        )
+    )
+)
 
-    environments = [
-        Environment.from_string(environment_string=environment)
-        for environment in environments.split('|')
-    ]
+
+all_environments = [
+    Environment.from_string(environment_string=environment)
+    for environment in all_environments.split('|')
+]
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.set_defaults(func=parser.print_help)
+
+    parser.add_argument(
+        '--environments',
+        default=all_environments,
+    )
+
+    args = parser.parse_args()
 
     matrix_entries = collections.OrderedDict(
         environment.to_matrix_entry()
-        for environment in environments
+        for environment in args.environments
     )
 
     json_matrix = json.dumps(matrix_entries)
