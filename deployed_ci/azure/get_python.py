@@ -29,6 +29,8 @@ def main():
     _, extension = os.path.splitext(args.python_binary)
     version = args.version.split('.')
 
+    targets = ['python']
+
     for i in range(len(version) + 1):
         version_text = '.'.join(version[:i])
         target = os.path.join(
@@ -36,6 +38,9 @@ def main():
             args.target_name + version_text + extension,
         )
 
+        targets.append(target)
+
+    for target in targets:
         print('copying: {!r} -> {!r}'.format(
             args.python_binary,
             target,
