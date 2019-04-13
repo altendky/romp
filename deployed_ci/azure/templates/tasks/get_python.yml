@@ -1,0 +1,66 @@
+steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: $(versionSpec)
+      architecture: $(architecture)
+    condition: eq(variables.interpreter, 'CPython')
+
+  - bash: |
+      echo $PATH
+    displayName: Report Path
+  - bash: |
+      echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin:$(PATH)"
+    displayName: Set $PATH - Linux PyPy
+    condition: and(eq( variables['Agent.OS'], 'Linux' ), eq(variables.interpreter, 'PyPy'))
+  - bash: |
+      echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin:$(PATH)"
+    displayName: Set $PATH - macOS PyPy
+    condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq(variables.interpreter, 'PyPy'))
+  - bash: |
+      echo "##vso[task.setvariable variable=PATH]$(System.DefaultWorkingDirectory)\pypy.tmp\pypy;$(System.DefaultWorkingDirectory)\pypy.tmp\pypy\bin;$(PATH)"
+    displayName: Set $PATH - Windows PyPy
+    condition: and(eq( variables['Agent.OS'], 'Windows_NT' ), eq(variables.interpreter, 'PyPy'))
+  - bash: |
+      echo $PATH
+    displayName: Report Path
+
+  - bash: |
+      mkdir pypy.tmp
+      cd pypy.tmp
+      curl --location --output archive $(python_url)
+      $(extracter) archive
+      rm archive
+      mv ./* pypy
+      cd ..
+    displayName: 'Get PyPy'
+    condition: eq(variables.interpreter, 'PyPy')
+  - bash: |
+      type $(python_binary)
+      $(python_binary) --version
+    displayName: 'Check for PyPy'
+    condition: eq(variables.interpreter, 'PyPy')
+
+  - bash: |
+      $(python_binary) deployed_ci/azure/get_python.py --python-binary "$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin/$(python_binary)" --target-name "pypy" --version ${VERSION_SPEC}
+    displayName: Alias PyPy - Linux
+    condition: and(eq( variables['Agent.OS'], 'Linux' ), eq(variables.interpreter, 'PyPy'))
+    env:
+      VERSION_SPEC: $(versionSpec)
+  - bash: |
+      $(python_binary) deployed_ci/azure/get_python.py --python-binary "$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/bin/$(python_binary)" --target-name "pypy" --version ${VERSION_SPEC}
+    displayName: Alias PyPy - macOS
+    condition: and(eq( variables['Agent.OS'], 'Darwin' ), eq(variables.interpreter, 'PyPy'))
+    env:
+      VERSION_SPEC: $(versionSpec)
+  - bash: |
+      $(python_binary) deployed_ci/azure/get_python.py --python-binary "$(System.DefaultWorkingDirectory)/pypy.tmp/pypy/$(python_binary)" --target-name "pypy" --version ${VERSION_SPEC}
+    displayName: Alias PyPy - Windows
+    condition: and(eq( variables['Agent.OS'], 'Windows_NT' ), eq(variables.interpreter, 'PyPy'))
+    env:
+      VERSION_SPEC: $(versionSpec)
+
+  - bash: |
+      curl --output pypy.tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
+      $(python_binary) pypy.tmp/get-pip.py
+    displayName: 'Get PIP'
+    condition: eq(variables.interpreter, 'PyPy')

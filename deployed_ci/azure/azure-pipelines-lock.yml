@@ -11,8 +11,10 @@ jobs:
     displayName: Generate Matrix
     steps:
       - bash: |
-          python deployed_ci/azure/matrix.py
+          python deployed_ci/azure/matrix.py --environments ${ROMP_ENVIRONMENTS}
         name: generate_matrix
+        env:
+          ROMP_ENVIRONMENTS: $(ROMP_ENVIRONMENTS)
 
   - job: get_input_archive
     displayName: Get input archive
@@ -35,10 +37,7 @@ jobs:
     strategy:
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: $(versionSpec)
-          architecture: $(architecture)
+      - template: templates/tasks/get_python.yml
       - task: DownloadPipelineArtifact@0
         inputs:
           artifactName: 'input'

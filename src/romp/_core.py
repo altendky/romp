@@ -155,9 +155,13 @@ def request_remote_lock_build(
         },
     )
 
+    print('response-----')
+    print('status:', response.status_code)
+    print('text:')
     print(response.text)
     response.raise_for_status()
     response_json = response.json()
+    print('json:')
     print(json.dumps(response_json, indent=4))
 
     return Build.from_response_json(response_json=response_json)
