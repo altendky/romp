@@ -144,6 +144,12 @@ def create_artifact_option(
     )
 
 
+platforms_choice = click.Choice(
+    choices=romp._matrix.all_platforms,
+    case_sensitive=False,
+)
+
+
 def create_matrix_platforms_option(
         envvar='ROMP_MATRIX_PLATFORMS',
 ):
@@ -154,11 +160,14 @@ def create_matrix_platforms_option(
         envvar=envvar,
         help='Platforms to matrix across',
         multiple=True,
-        type=click.Choice(
-            choices=romp._matrix.all_platforms,
-            case_sensitive=False,
-        ),
+        type=platforms_choice,
     )
+
+
+interpreters_choice = click.Choice(
+    choices=romp._matrix.all_interpreters,
+    case_sensitive=False,
+)
 
 
 def create_matrix_interpreters_option(
@@ -171,11 +180,14 @@ def create_matrix_interpreters_option(
         envvar=envvar,
         help='Interpreters to matrix across',
         multiple=True,
-        type=click.Choice(
-            choices=romp._matrix.all_interpreters,
-            case_sensitive=False,
-        ),
+        type=interpreters_choice,
     )
+
+
+versions_choice = click.Choice(
+    choices=romp._matrix.all_versions,
+    case_sensitive=False,
+)
 
 
 def create_matrix_versions_option(
@@ -188,10 +200,7 @@ def create_matrix_versions_option(
         envvar=envvar,
         help='Versions to matrix across',
         multiple=True,
-        type=click.Choice(
-            choices=romp._matrix.all_versions,
-            case_sensitive=False,
-        ),
+        type=versions_choice,
     )
 
 
@@ -199,6 +208,12 @@ all_architectures = [
     str(architecture)
     for architecture in romp._matrix.all_architectures
 ]
+
+
+architectures_choice = click.Choice(
+    choices=all_architectures,
+    case_sensitive=False,
+)
 
 
 def create_matrix_architectures_option(
@@ -211,10 +226,49 @@ def create_matrix_architectures_option(
         envvar=envvar,
         help='Architectures to matrix across',
         multiple=True,
-        type=click.Choice(
-            choices=all_architectures,
-            case_sensitive=False,
+        type=architectures_choice,
+    )
+
+
+def create_matrix_element_option(
+        *args,
+        envvar,
+        help,
+        multiple=True,
+):
+    return create_option(
+        *args,
+        envvar=envvar,
+        help=help,
+        multiple=multiple,
+        type=(
+            platforms_choice,
+            interpreters_choice,
+            versions_choice,
+            architectures_choice
         ),
+    )
+
+
+def create_matrix_include_option(
+        envvar='ROMP_MATRIX_INCLUDES',
+):
+    return create_matrix_element_option(
+        '--include',
+        'matrix_includes',
+        envvar=envvar,
+        help='Complete environments to include in the matrix',
+    )
+
+
+def create_matrix_exclude_option(
+        envvar='ROMP_MATRIX_EXCLUDES',
+):
+    return create_matrix_element_option(
+        '--exclude',
+        'matrix_excludes',
+        envvar=envvar,
+        help='Complete environments to exclude from the matrix',
     )
 
 
@@ -233,6 +287,8 @@ def create_matrix_architectures_option(
 @create_matrix_interpreters_option()
 @create_matrix_versions_option()
 @create_matrix_architectures_option()
+@create_matrix_include_option()
+@create_matrix_exclude_option()
 def main(
         personal_access_token,
         build_request_url,
@@ -248,6 +304,8 @@ def main(
         matrix_interpreters,
         matrix_versions,
         matrix_architectures,
+        matrix_includes,
+        matrix_excludes,
 ):
     matrix_specified = any(
         len(dimension) > 0
@@ -273,6 +331,36 @@ def main(
         versions=matrix_versions,
         architectures=matrix_architectures,
     )
+
+    include_environments = [
+        romp._matrix.Environment(
+            platform=platform,
+            interpreter=interpreter,
+            version=version,
+            architecture=int(architecture),
+        )
+        for platform, interpreter, version, architecture in matrix_includes
+    ]
+
+    exclude_environments = [
+        romp._matrix.Environment(
+            platform=platform,
+            interpreter=interpreter,
+            version=version,
+            architecture=int(architecture),
+        )
+        for platform, interpreter, version, architecture in matrix_excludes
+    ]
+
+    environments = [
+        environment
+        for environment in environments + include_environments
+        if environment not in exclude_environments
+    ]
+
+
+    print(json.dumps([x.to_matrix_entry() for x in environments], indent=4))
+    return
 
     environments_string = romp._matrix.string_from_environments(environments)
 
