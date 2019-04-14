@@ -231,13 +231,15 @@ def create_matrix_architectures_option(
 
 
 def create_matrix_element_option(
-        *args,
+        long,
+        destination,
         envvar,
         help,
         multiple=True,
 ):
     return create_option(
-        *args,
+        long,
+        destination,
         envvar=envvar,
         help=help,
         multiple=multiple,
@@ -254,8 +256,8 @@ def create_matrix_include_option(
         envvar='ROMP_MATRIX_INCLUDES',
 ):
     return create_matrix_element_option(
-        '--include',
-        'matrix_includes',
+        long='--include',
+        destination='matrix_includes',
         envvar=envvar,
         help='Complete environments to include in the matrix',
     )
@@ -265,8 +267,8 @@ def create_matrix_exclude_option(
         envvar='ROMP_MATRIX_EXCLUDES',
 ):
     return create_matrix_element_option(
-        '--exclude',
-        'matrix_excludes',
+        long='--exclude',
+        destination='matrix_excludes',
         envvar=envvar,
         help='Complete environments to exclude from the matrix',
     )
@@ -357,10 +359,6 @@ def main(
         for environment in environments + include_environments
         if environment not in exclude_environments
     ]
-
-
-    print(json.dumps([x.to_matrix_entry() for x in environments], indent=4))
-    return
 
     environments_string = romp._matrix.string_from_environments(environments)
 
