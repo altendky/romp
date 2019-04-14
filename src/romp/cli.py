@@ -85,7 +85,10 @@ def create_environments_option(
     return create_option(
         '--environments',
         envvar=envvar,
-        help='Targets to run on',
+        help=(
+            'Targets to run on.  Mostly use the matrix options instead.'
+            '  This may be removed.'
+        ),
     )
 
 
