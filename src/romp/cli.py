@@ -245,6 +245,7 @@ def create_matrix_element_option(
         destination,
         envvar=envvar,
         help=help,
+        metavar='<PLATFORM INTERPRETER VERSION ARCHITECTURE>',
         multiple=multiple,
         type=(
             platforms_choice,
