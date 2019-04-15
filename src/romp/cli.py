@@ -1,6 +1,7 @@
 import functools
 import getpass
 import json
+import sys
 
 import click
 
@@ -327,7 +328,7 @@ def main(
         # TODO: this isn't really nice, maybe drop environments all together?
         #       or maybe it turns into '--include Windows,CPython,3.7,6.4' etc?
         click.echo('Specify either an environments list or matrix parameters')
-        return 1
+        sys.exit(1)
 
     matrix_architectures = [int(a) for a in matrix_architectures]
 
