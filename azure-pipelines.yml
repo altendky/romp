@@ -9,7 +9,7 @@ jobs:
     displayName: Generate Matrix
     steps:
       - bash: |
-          python deployed_ci/azure/matrix.py
+          python src/romp/_matrix.py
         name: generate_matrix
 
   - job: test

@@ -11,7 +11,7 @@ jobs:
     displayName: Generate Matrix
     steps:
       - bash: |
-          python deployed_ci/azure/matrix.py --environments ${ROMP_ENVIRONMENTS}
+          python src/romp/_matrix.py --environments ${ROMP_ENVIRONMENTS}
         name: generate_matrix
         env:
           ROMP_ENVIRONMENTS: $(ROMP_ENVIRONMENTS)

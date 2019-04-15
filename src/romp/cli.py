@@ -1,9 +1,12 @@
 import functools
 import getpass
+import json
+import sys
 
 import click
 
 import romp._core
+import romp._matrix
 
 
 @functools.wraps(click.option)
@@ -82,9 +85,11 @@ def create_environments_option(
 ):
     return create_option(
         '--environments',
-        default='|Linux-3.6-x64|macOS-3.6-x64',
         envvar=envvar,
-        help='Targets to run on',
+        help=(
+            'Targets to run on.  Mostly use the matrix options instead.'
+            '  This may be removed.'
+        ),
     )
 
 
@@ -143,6 +148,137 @@ def create_artifact_option(
     )
 
 
+platforms_choice = click.Choice(
+    choices=romp._matrix.all_platforms,
+    case_sensitive=False,
+)
+
+
+def create_matrix_platforms_option(
+        envvar='ROMP_MATRIX_PLATFORMS',
+):
+    return create_option(
+        '--platform',
+        'matrix_platforms',
+        default=romp._matrix.all_platforms,
+        envvar=envvar,
+        help='Platforms to matrix across',
+        multiple=True,
+        type=platforms_choice,
+    )
+
+
+interpreters_choice = click.Choice(
+    choices=romp._matrix.all_interpreters,
+    case_sensitive=False,
+)
+
+
+def create_matrix_interpreters_option(
+        envvar='ROMP_MATRIX_INTERPRETERS',
+):
+    return create_option(
+        '--interpreter',
+        'matrix_interpreters',
+        default=romp._matrix.all_interpreters,
+        envvar=envvar,
+        help='Interpreters to matrix across',
+        multiple=True,
+        type=interpreters_choice,
+    )
+
+
+versions_choice = click.Choice(
+    choices=romp._matrix.all_versions,
+    case_sensitive=False,
+)
+
+
+def create_matrix_versions_option(
+        envvar='ROMP_MATRIX_VERSIONS',
+):
+    return create_option(
+        '--version',
+        'matrix_versions',
+        default=romp._matrix.all_versions,
+        envvar=envvar,
+        help='Versions to matrix across',
+        multiple=True,
+        type=versions_choice,
+    )
+
+
+all_architectures = [
+    str(architecture)
+    for architecture in romp._matrix.all_architectures
+]
+
+
+architectures_choice = click.Choice(
+    choices=all_architectures,
+    case_sensitive=False,
+)
+
+
+def create_matrix_architectures_option(
+        envvar='ROMP_MATRIX_ARCHITECTURES',
+):
+    return create_option(
+        '--architecture',
+        'matrix_architectures',
+        default=all_architectures,
+        envvar=envvar,
+        help='Architectures to matrix across',
+        multiple=True,
+        type=architectures_choice,
+    )
+
+
+def create_matrix_element_option(
+        long,
+        destination,
+        envvar,
+        help,
+        multiple=True,
+):
+    return create_option(
+        long,
+        destination,
+        envvar=envvar,
+        help=help,
+        metavar='<PLATFORM INTERPRETER VERSION ARCHITECTURE>',
+        multiple=multiple,
+        type=(
+            platforms_choice,
+            interpreters_choice,
+            versions_choice,
+            architectures_choice
+        ),
+    )
+
+
+def create_matrix_include_option(
+        envvar='ROMP_MATRIX_INCLUDES',
+):
+    return create_matrix_element_option(
+        long='--include',
+        destination='matrix_includes',
+        envvar=envvar,
+        help='Complete environments to include in the matrix',
+    )
+
+
+def create_matrix_exclude_option(
+        envvar='ROMP_MATRIX_EXCLUDES',
+):
+    return create_matrix_element_option(
+        long='--exclude',
+        destination='matrix_excludes',
+        envvar=envvar,
+        help='Complete environments to exclude from the matrix',
+    )
+
+
 @click.command()
 @create_personal_access_token_option()
 @create_build_request_url_option()
@@ -154,6 +290,12 @@ def create_artifact_option(
 @create_definition_id_option()
 @create_archive_option()
 @create_artifact_option()
+@create_matrix_platforms_option()
+@create_matrix_interpreters_option()
+@create_matrix_versions_option()
+@create_matrix_architectures_option()
+@create_matrix_include_option()
+@create_matrix_exclude_option()
 def main(
         personal_access_token,
         build_request_url,
@@ -165,7 +307,66 @@ def main(
         definition_id,
         archive,
         artifact,
+        matrix_platforms,
+        matrix_interpreters,
+        matrix_versions,
+        matrix_architectures,
+        matrix_includes,
+        matrix_excludes,
 ):
+    matrix_specified = any(
+        len(dimension) > 0
+        for dimension in (
+            matrix_platforms,
+            matrix_interpreters,
+            matrix_versions,
+            matrix_architectures,
+        )
+    )
+
+    if environments is not None and matrix_specified:
+        # TODO: this isn't really nice, maybe drop environments all together?
+        #       or maybe it turns into '--include Windows,CPython,3.7,6.4' etc?
+        click.echo('Specify either an environments list or matrix parameters')
+        sys.exit(1)
+
+    matrix_architectures = [int(a) for a in matrix_architectures]
+
+    environments = romp._matrix.build_environments(
+        platforms=matrix_platforms,
+        interpreters=matrix_interpreters,
+        versions=matrix_versions,
+        architectures=matrix_architectures,
+    )
+
+    include_environments = [
+        romp._matrix.Environment(
+            platform=platform,
+            interpreter=interpreter,
+            version=version,
+            architecture=int(architecture),
+        )
+        for platform, interpreter, version, architecture in matrix_includes
+    ]
+
+    exclude_environments = [
+        romp._matrix.Environment(
+            platform=platform,
+            interpreter=interpreter,
+            version=version,
+            architecture=int(architecture),
+        )
+        for platform, interpreter, version, architecture in matrix_excludes
+    ]
+
+    environments = [
+        environment
+        for environment in environments + include_environments
+        if environment not in exclude_environments
+    ]
+
+    environments_string = romp._matrix.string_from_environments(environments)
+
     archive_url = None
     if archive is not None:
         archive_bytes = archive.read()
@@ -179,7 +380,7 @@ def main(
         personal_access_token=personal_access_token,
         build_request_url=build_request_url,
         command=command,
-        environments=environments,
+        environments=environments_string,
         source_branch=source_branch,
         definition_id=definition_id,
     )

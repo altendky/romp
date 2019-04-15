@@ -1,5 +1,9 @@
+# This is used for the CI side without any installation
+# standard lib only
+
 import argparse
 import collections
+import itertools
 import json
 import sys
 
@@ -11,20 +15,37 @@ vm_images = collections.OrderedDict((
 ))
 
 
+all_platforms = tuple(vm_images.keys())
+
+
 interpreters = collections.OrderedDict((
     ('CPython', 'CPython'),
     ('PyPy', 'PyPy'),
 ))
 
-versions = {
-    'CPython': ('2.7', '3.4', '3.5', '3.6', '3.7'),
-    'PyPy': ('2.7', '3.5'),
-}
+
+all_interpreters = tuple(interpreters.keys())
+
+
+versions = collections.OrderedDict((
+    ('CPython', ('2.7', '3.4', '3.5', '3.6', '3.7')),
+    ('PyPy', ('2.7', '3.5')),
+))
+
+
+all_versions = tuple(sorted(set(
+    itertools.chain.from_iterable(versions.values())
+)))
+
 
 architectures = collections.OrderedDict((
     (32, 'x86'),
     (64, 'x64'),
 ))
+
+
+all_architectures = tuple(architectures.keys())
+
 
 urls = collections.OrderedDict((
     (('Linux', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-linux64.tar.bz2'),
@@ -34,6 +55,7 @@ urls = collections.OrderedDict((
     (('Windows', 'PyPy', '2.7', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-win32.zip'),
     (('Windows', 'PyPy', '3.5', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-win32.zip'),
 ))
+
 
 extracters = {
     'Linux': 'tar -xvf',
@@ -111,28 +133,94 @@ class Environment:
             },
         )
 
+    def __eq__(self, other):
+        return (
+            self.platform == other.platform
+            and self.vm_image == other.vm_image
+            and self.interpreter == other.interpreter
+            and self.version == other.version
+            and self.architecture == other.architecture
+        )
 
-all_environments = '|'.join(
-    '-'.join((platform, interpreter, version, str(architecture)))
-    for platform in vm_images
-    for interpreter in interpreters
-    for version in versions[interpreter]
-    for architecture in (32, 64)
-    if not (
-        (
-            architecture == 32
-            and (
-                platform != 'Windows'
-                or interpreter != 'PyPy'
-            )
+
+def build_all_environments():
+    return [
+        Environment(
+            platform=platform,
+            interpreter=interpreter,
+            version=version,
+            architecture=architecture,
         )
-        or (
-            platform == 'Windows'
-            and interpreter == 'PyPy'
-            and architecture == 64
+        for platform in vm_images
+        for interpreter in interpreters
+        for version in versions[interpreter]
+        for architecture in (32, 64)
+        if not (
+                (
+                        architecture == 32
+                        and (
+                                platform != 'Windows'
+                                or interpreter != 'PyPy'
+                        )
+                )
+                or (
+                        platform == 'Windows'
+                        and interpreter == 'PyPy'
+                        and architecture == 64
+                )
         )
+    ]
+
+
+def string_from_environments(environments):
+    return '|'.join(
+        '-'.join((
+            environment.platform,
+            environment.interpreter,
+            environment.version,
+            str(environment.architecture)))
+        for environment in environments
     )
-)
+
+
+def build_environments_from_string(environments):
+    environments = [
+        Environment.from_string(environment_string=environment)
+        for environment in environments.split('|')
+    ]
+
+    return collections.OrderedDict(
+        environment.to_matrix_entry()
+        for environment in environments
+    )
+
+
+def build_environments(
+        platforms=all_platforms,
+        interpreters=all_interpreters,
+        versions=all_versions,
+        architectures=all_architectures,
+):
+    all_environments = build_all_environments()
+
+    built_environments = [
+        Environment(
+            platform=platform,
+            interpreter=interpreter,
+            version=version,
+            architecture=architecture,
+        )
+        for platform in platforms
+        for interpreter in interpreters
+        for version in versions
+        for architecture in architectures
+    ]
+
+    return [
+        environment
+        for environment in built_environments
+        if environment in all_environments
+    ]
 
 
 def main():
@@ -143,19 +231,13 @@ def main():
 
     parser.add_argument(
         '--environments',
-        default=all_environments,
+        default=string_from_environments(build_all_environments()),
     )
 
     args = parser.parse_args()
 
-    environments = [
-        Environment.from_string(environment_string=environment)
-        for environment in args.environments.split('|')
-    ]
-
-    matrix_entries = collections.OrderedDict(
-        environment.to_matrix_entry()
-        for environment in environments
+    matrix_entries = build_environments_from_string(
+        environments=args.environments,
     )
 
     json_matrix = json.dumps(matrix_entries)
