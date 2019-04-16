@@ -64,6 +64,27 @@ extracters = {
 }
 
 
+# class NoCaseInsensitiveMatchError(Exception):
+#     @classmethod
+#     def build(cls, raw, values):
+#         return cls(
+#             'No match found for {raw} in: {values}'.format(
+#                 raw=raw,
+#                 values=', '.join(values),
+#             )
+#         )
+#
+#
+# def normalize_case(raw, values):
+#     raw = raw.lower()
+#
+#     for value in values:
+#         if raw == value.lower():
+#             return value
+#
+#     raise NoCaseInsensitiveMatchError.build(raw=raw, values=values)
+
+
 class Environment:
     def __init__(self, platform, interpreter, version, architecture):
         self.platform = platform

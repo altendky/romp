@@ -1,3 +1,4 @@
+import collections
 import functools
 import getpass
 import glob
@@ -8,12 +9,78 @@ import logging
 import sys
 
 import click
+import click.types
 
 import romp._core
 import romp._matrix
 
 
 logger = logging.getLogger(__name__)
+
+
+# https://github.com/pallets/click/pull/1278
+class Choice(click.types.ParamType):
+    """The choice type allows a value to be checked against a fixed set
+    of supported values. All of these values have to be strings.
+
+    You should only pass a list or tuple of choices. Other iterables
+    (like generators) may lead to surprising results.
+
+    See :ref:`choice-opts` for an example.
+
+    :param case_sensitive: Set to false to make choices case
+        insensitive. Defaults to true.
+    :param coerce_case: Resulting values are exactly as passed to `choices`
+        rather than as collected from the command line.  Defaults to false.
+    """
+
+    name = 'choice'
+
+    def __init__(self, choices, case_sensitive=True, coerce_case=False):
+        self.choices = choices
+        self.case_sensitive = case_sensitive
+        self.coerce_case = coerce_case
+
+    def get_metavar(self, param):
+        return '[%s]' % '|'.join(self.choices)
+
+    def get_missing_message(self, param):
+        return 'Choose from:\n\t%s.' % ',\n\t'.join(self.choices)
+
+    def convert(self, value, param, ctx):
+        # Exact match
+        if value in self.choices:
+            return value
+
+        # Match through normalization and case sensitivity
+        # first do token_normalize_func, then lowercase
+        # preserve original `value` to produce an accurate message in
+        # `self.fail`
+        normed_value = value
+        normed_choices = self.choices
+
+        if ctx is not None and \
+           ctx.token_normalize_func is not None:
+            normed_value = ctx.token_normalize_func(value)
+            normed_choices = [ctx.token_normalize_func(choice) for choice in
+                              self.choices]
+
+        if not self.case_sensitive:
+            normed_value = normed_value.lower()
+            normed_choices = [choice.lower() for choice in normed_choices]
+
+        for normed_choice, choice in zip(normed_choices, self.choices):
+            if normed_value == normed_choice:
+                if self.coerce_case:
+                    return choice
+
+                return normed_value
+
+        self.fail('invalid choice: %s. (choose from %s)' %
+                  (value, ', '.join(self.choices)), param, ctx)
+
+    def __repr__(self):
+        return 'Choice(%r)' % list(self.choices)
 
 
 @functools.wraps(click.option)
@@ -155,9 +222,10 @@ def create_artifact_option(
     )
 
 
-platforms_choice = click.Choice(
+platforms_choice = Choice(
     choices=romp._matrix.all_platforms,
     case_sensitive=False,
+    coerce_case=True,
 )
 
 
@@ -175,9 +243,10 @@ def create_matrix_platforms_option(
     )
 
 
-interpreters_choice = click.Choice(
+interpreters_choice = Choice(
     choices=romp._matrix.all_interpreters,
     case_sensitive=False,
+    coerce_case=True,
 )
 
 
@@ -195,9 +264,10 @@ def create_matrix_interpreters_option(
     )
 
 
-versions_choice = click.Choice(
+versions_choice = Choice(
     choices=romp._matrix.all_versions,
     case_sensitive=False,
+    coerce_case=True,
 )
 
 
@@ -221,9 +291,10 @@ all_architectures = [
 ]
 
 
-architectures_choice = click.Choice(
+architectures_choice = Choice(
     choices=all_architectures,
     case_sensitive=False,
+    coerce_case=True,
 )
 
 
@@ -354,6 +425,18 @@ def main(
         for path in archive_paths
     ))
 
+    # dimensions = (
+    #     (list(matrix_platforms), romp._matrix.all_platforms),
+    #     (list(matrix_interpreters), romp._matrix.all_interpreters),
+    #     (list(matrix_versions), romp._matrix.all_versions),
+    #     (list(matrix_architectures), romp._matrix.all_architectures),
+    # )
+    #
+    # matrix_specified = any(
+    #     len(dimension) > 0
+    #     for dimension, all_values in dimensions
+    # )
+
     matrix_specified = any(
         len(dimension) > 0
         for dimension in (
@@ -374,7 +457,11 @@ def main(
         click.echo('Specify either an archive file or archive paths')
         sys.exit(1)
 
-    matrix_architectures = [int(a) for a in matrix_architectures]
+    # for dimension, all_values in dimensions:
+    #     dimension[:] = [
+    #         romp._matrix.normalize_case(raw, all_values)
+    #         for raw in dimension
+    #     ]
 
     environments = romp._matrix.build_environments(
         platforms=matrix_platforms,
