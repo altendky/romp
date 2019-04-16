@@ -475,7 +475,7 @@ def main(
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=int(architecture),
+            architecture=architecture,
         )
         for platform, interpreter, version, architecture in matrix_includes
     ]
@@ -485,7 +485,7 @@ def main(
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=int(architecture),
+            architecture=architecture,
         )
         for platform, interpreter, version, architecture in matrix_excludes
     ]
