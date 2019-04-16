@@ -39,8 +39,8 @@ all_versions = tuple(sorted(set(
 
 
 architectures = collections.OrderedDict((
-    (32, 'x86'),
-    (64, 'x64'),
+    ('32', 'x86'),
+    ('64', 'x64'),
 ))
 
 
@@ -102,7 +102,7 @@ class Environment:
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=architectures[int(bit_width)]
+            architecture=architectures[bit_width]
         )
 
     def python_binary(self):
@@ -172,10 +172,10 @@ def build_all_environments():
             version=version,
             architecture=architecture,
         )
-        for platform in vm_images
-        for interpreter in interpreters
+        for platform in all_platforms
+        for interpreter in all_interpreters
         for version in versions[interpreter]
-        for architecture in (32, 64)
+        for architecture in all_architectures
         if not (
                 (
                         architecture == 32
