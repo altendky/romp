@@ -178,7 +178,7 @@ def build_all_environments():
         for architecture in all_architectures
         if not (
                 (
-                        architecture == 32
+                        architecture == '32'
                         and (
                                 platform != 'Windows'
                                 or interpreter != 'PyPy'
@@ -187,7 +187,7 @@ def build_all_environments():
                 or (
                         platform == 'Windows'
                         and interpreter == 'PyPy'
-                        and architecture == 64
+                        and architecture == '64'
                 )
         )
     ]
