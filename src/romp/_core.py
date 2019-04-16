@@ -1,6 +1,7 @@
 import glob
 import io
 import json
+import logging
 import os
 import tarfile
 import time
@@ -8,6 +9,9 @@ import zipfile
 
 import requests
 import requests.auth
+
+
+logger = logging.getLogger(__name__)
 
 
 def write_tarball_bytes(file, paths, paths_root):
@@ -32,11 +36,11 @@ class Build:
 
     def wait_for_lock_build(self, check_period=15):
         while True:
-            print("build url:", self.url)
+            logger.info("build url: %s", self.url)
             response = requests.get(self.url)
 
             response.raise_for_status()
-            print(response.content)
+            logger.info(response.content)
             response_json = response.json()
 
             status = response_json['status']
@@ -44,13 +48,12 @@ class Build:
             if status == 'completed':
                 break
 
-            print()
-            print('Url:', self.human_url)
-            print('Build Status: ' + status)
-            print(
-                '    waiting {} seconds to check again for completion'.format(
-                    check_period,
-                ),
+            logger.info('')
+            logger.info('Url: %s', self.human_url)
+            logger.info('Build Status: %s', status)
+            logger.info(
+                '    waiting %s seconds to check again for completion',
+                check_period,
             )
             time.sleep(check_period)
 
@@ -62,7 +65,7 @@ class Build:
         # ).format(build_id=self.id)
         url = os.path.join(self.url, 'artifacts')
 
-        print('artifact url:', url)
+        logger.info('artifact url: %s', url)
 
         response = requests.get(
             url=url,
@@ -107,7 +110,7 @@ def strip_zip_info_prefixes(prefix, zip_infos):
             continue
 
         zip_info.filename = os.path.relpath(name, prefix)
-        print(name, '->', zip_info.filename)
+        logger.info('%s -> %s', name, zip_info.filename)
         result.append(zip_info)
 
     return result
@@ -126,7 +129,7 @@ def post_file(data):
     if not response_json['success']:
         raise Exception('failed to upload archive')
 
-    print('response_json:', json.dumps(response_json, indent=4))
+    logger.info('response_json: %s', json.dumps(response_json, indent=4))
 
     return response_json['link']
 
@@ -162,13 +165,13 @@ def request_remote_lock_build(
         },
     )
 
-    print('response-----')
-    print('status:', response.status_code)
-    print('text:')
-    print(response.text)
+    logger.info('response-----')
+    logger.info('status: %s', response.status_code)
+    logger.info('text:')
+    logger.info(response.text)
     response.raise_for_status()
     response_json = response.json()
-    print('json:')
-    print(json.dumps(response_json, indent=4))
+    logger.info('json:')
+    logger.info(json.dumps(response_json, indent=4))
 
     return Build.from_response_json(response_json=response_json)

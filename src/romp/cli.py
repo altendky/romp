@@ -4,12 +4,16 @@ import glob
 import io
 import itertools
 import json
+import logging
 import sys
 
 import click
 
 import romp._core
 import romp._matrix
+
+
+logger = logging.getLogger(__name__)
 
 
 @functools.wraps(click.option)
@@ -282,6 +286,16 @@ def create_matrix_exclude_option(
     )
 
 
+def logging_level_from_verbosity(verbosity):
+    if verbosity <= 0:
+        return logging.WARNING
+
+    if verbosity <= 1:
+        return logging.INFO
+
+    return logging.DEBUG
+
+
 @click.command()
 @create_personal_access_token_option()
 @create_build_request_url_option()
@@ -310,6 +324,7 @@ def create_matrix_exclude_option(
     type=str,
     nargs=-1,
 )
+@click.option('--verbose', 'verbosity', count=True)
 def main(
         personal_access_token,
         build_request_url,
@@ -329,7 +344,11 @@ def main(
         matrix_excludes,
         archive_paths_root,
         archive_paths,
+        verbosity,
 ):
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging_level_from_verbosity(verbosity))
+
     archive_paths = list(itertools.chain.from_iterable(
         glob.glob(path)
         for path in archive_paths
@@ -393,20 +412,25 @@ def main(
     environments_string = romp._matrix.string_from_environments(environments)
 
     archive_url = None
+    archive_bytes = None
     if archive_file is not None:
         archive_bytes = archive_file.read()
-        archive_url = romp._core.post_file(data=archive_bytes)
     elif len(archive_paths) > 0:
+        click.echo('Archiving paths for upload')
         archive_bytesio = io.BytesIO()
         romp._core.write_tarball_bytes(
             file=archive_bytesio,
             paths=archive_paths,
             paths_root=archive_paths_root,
         )
-        archive_url = romp._core.post_file(data=archive_bytesio.getvalue())
+        archive_bytes = archive_bytesio.getvalue()
 
-    print(archive_url)
+    if archive_bytes is not None:
+        click.echo('Uploading archive')
+        archive_url = romp._core.post_file(data=archive_bytes)
+        click.echo('Archive URL: {}'.format(archive_url))
 
+    click.echo('Requesting build')
     build = romp._core.request_remote_lock_build(
         archive_url=archive_url,
         username=username,
@@ -418,7 +442,10 @@ def main(
         definition_id=definition_id,
     )
 
+    click.echo('Waiting for build: {}'.format(build.human_url))
+
     build.wait_for_lock_build(check_period=check_period)
 
     if artifact is not None:
+        click.echo('Handling artifact')
         build.get_lock_build_artifact(artifact_file=artifact)
