@@ -20,6 +20,7 @@ def test_all():
             '--architecture', '64',
             '--exclude', 'Windows', 'CPython', '3.7', '64',
             '--include', 'Linux', 'PyPy', '3.5', '64',
+            '--archive-paths-root', here,
             command_path,
             # '--environments', '|'.join((
             #     'Linux-CPython-3.7-64',

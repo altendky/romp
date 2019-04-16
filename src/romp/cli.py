@@ -299,6 +299,12 @@ def create_matrix_exclude_option(
 @create_matrix_architectures_option()
 @create_matrix_include_option()
 @create_matrix_exclude_option()
+@click.option(
+    '--archive-paths-root',
+    envvar='ROMP_ARCHIVE_PATHS_ROOT',
+    help='',
+    type=click.Path(exists=True, file_okay=False),
+)
 @click.argument(
     'archive_paths',
     type=str,
@@ -321,6 +327,7 @@ def main(
         matrix_architectures,
         matrix_includes,
         matrix_excludes,
+        archive_paths_root,
         archive_paths,
 ):
     archive_paths = list(itertools.chain.from_iterable(
@@ -394,6 +401,7 @@ def main(
         romp._core.write_tarball_bytes(
             file=archive_bytesio,
             paths=archive_paths,
+            paths_root=archive_paths_root,
         )
         archive_url = romp._core.post_file(data=archive_bytesio.getvalue())
 

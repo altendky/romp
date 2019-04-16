@@ -10,10 +10,10 @@ import requests
 import requests.auth
 
 
-def write_tarball_bytes(file, paths):
+def write_tarball_bytes(file, paths, paths_root):
     with tarfile.TarFile(fileobj=file, mode='w') as archive:
         for path in paths:
-            archive.add(path)
+            archive.add(name=path, arcname=os.path.relpath(path, paths_root))
 
 
 class Build:
