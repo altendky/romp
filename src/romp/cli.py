@@ -1,5 +1,8 @@
 import functools
 import getpass
+import glob
+import io
+import itertools
 import json
 import sys
 
@@ -130,7 +133,7 @@ def create_archive_option(
         envvar='ROMP_ARCHIVE',
 ):
     return create_option(
-        '--archive',
+        '--archive-file',
         envvar=envvar,
         help='The archive to be uploaded to the build',
         type=click.File('rb'),
@@ -296,6 +299,17 @@ def create_matrix_exclude_option(
 @create_matrix_architectures_option()
 @create_matrix_include_option()
 @create_matrix_exclude_option()
+@click.option(
+    '--archive-paths-root',
+    envvar='ROMP_ARCHIVE_PATHS_ROOT',
+    help='',
+    type=click.Path(exists=True, file_okay=False),
+)
+@click.argument(
+    'archive_paths',
+    type=str,
+    nargs=-1,
+)
 def main(
         personal_access_token,
         build_request_url,
@@ -305,7 +319,7 @@ def main(
         check_period,
         source_branch,
         definition_id,
-        archive,
+        archive_file,
         artifact,
         matrix_platforms,
         matrix_interpreters,
@@ -313,7 +327,14 @@ def main(
         matrix_architectures,
         matrix_includes,
         matrix_excludes,
+        archive_paths_root,
+        archive_paths,
 ):
+    archive_paths = list(itertools.chain.from_iterable(
+        glob.glob(path)
+        for path in archive_paths
+    ))
+
     matrix_specified = any(
         len(dimension) > 0
         for dimension in (
@@ -328,6 +349,10 @@ def main(
         # TODO: this isn't really nice, maybe drop environments all together?
         #       or maybe it turns into '--include Windows,CPython,3.7,6.4' etc?
         click.echo('Specify either an environments list or matrix parameters')
+        sys.exit(1)
+
+    if archive_file is not None and len(archive_paths) > 0:
+        click.echo('Specify either an archive file or archive paths')
         sys.exit(1)
 
     matrix_architectures = [int(a) for a in matrix_architectures]
@@ -368,9 +393,17 @@ def main(
     environments_string = romp._matrix.string_from_environments(environments)
 
     archive_url = None
-    if archive is not None:
-        archive_bytes = archive.read()
+    if archive_file is not None:
+        archive_bytes = archive_file.read()
         archive_url = romp._core.post_file(data=archive_bytes)
+    elif len(archive_paths) > 0:
+        archive_bytesio = io.BytesIO()
+        romp._core.write_tarball_bytes(
+            file=archive_bytesio,
+            paths=archive_paths,
+            paths_root=archive_paths_root,
+        )
+        archive_url = romp._core.post_file(data=archive_bytesio.getvalue())
 
     print(archive_url)
 
