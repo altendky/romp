@@ -2,11 +2,18 @@ import glob
 import io
 import json
 import os
+import tarfile
 import time
 import zipfile
 
 import requests
 import requests.auth
+
+
+def write_tarball_bytes(file, paths):
+    with tarfile.TarFile(fileobj=file, mode='w') as archive:
+        for path in paths:
+            archive.add(path)
 
 
 class Build:
