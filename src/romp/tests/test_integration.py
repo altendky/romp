@@ -15,7 +15,7 @@ def test_all():
             sys.executable,
             '-m', 'romp',
             '--command', 'python {}'.format(command_name),
-            '--interpreter', 'CPython',
+            '--interpreter', 'cpYThon',
             '--version', '3.7',
             '--architecture', '64',
             '--exclude', 'Windows', 'CPython', '3.7', '64',
