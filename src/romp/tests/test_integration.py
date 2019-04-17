@@ -2,6 +2,8 @@ import os.path
 import subprocess
 import sys
 
+import pytest
+
 
 here = os.path.dirname(os.path.normpath(os.path.abspath(__file__)))
 
@@ -37,3 +39,18 @@ def test_all():
             # skip '--artifact', '',
         ],
     )
+
+
+def test_failure_fails():
+    with pytest.raises(subprocess.CalledProcessError):
+        subprocess.check_call(
+            [
+                sys.executable,
+                '-m', 'romp',
+                '--command', 'false',
+                '--platform', 'Linux',
+                '--interpreter', 'CPython',
+                '--version', '3.7',
+                '--architecture', '64',
+            ],
+        )

@@ -514,8 +514,13 @@ def main(
 
     click.echo('Waiting for build: {}'.format(build.human_url))
 
-    build.wait_for_lock_build(check_period=check_period)
+    response_json = build.wait_for_lock_build(check_period=check_period)
 
     if artifact is not None:
         click.echo('Handling artifact')
         build.get_lock_build_artifact(artifact_file=artifact)
+
+    if response_json['result'] != 'succeeded':
+        sys.exit(1)
+
+    sys.exit(0)

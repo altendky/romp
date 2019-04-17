@@ -46,7 +46,7 @@ class Build:
             status = response_json['status']
 
             if status == 'completed':
-                break
+                return response_json
 
             logger.info('')
             logger.info('Url: %s', self.human_url)
