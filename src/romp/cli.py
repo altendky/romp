@@ -425,18 +425,6 @@ def main(
         for path in archive_paths
     ))
 
-    # dimensions = (
-    #     (list(matrix_platforms), romp._matrix.all_platforms),
-    #     (list(matrix_interpreters), romp._matrix.all_interpreters),
-    #     (list(matrix_versions), romp._matrix.all_versions),
-    #     (list(matrix_architectures), romp._matrix.all_architectures),
-    # )
-    #
-    # matrix_specified = any(
-    #     len(dimension) > 0
-    #     for dimension, all_values in dimensions
-    # )
-
     matrix_specified = any(
         len(dimension) > 0
         for dimension in (
@@ -456,12 +444,6 @@ def main(
     if archive_file is not None and len(archive_paths) > 0:
         click.echo('Specify either an archive file or archive paths')
         sys.exit(1)
-
-    # for dimension, all_values in dimensions:
-    #     dimension[:] = [
-    #         romp._matrix.normalize_case(raw, all_values)
-    #         for raw in dimension
-    #     ]
 
     environments = romp._matrix.build_environments(
         platforms=matrix_platforms,
