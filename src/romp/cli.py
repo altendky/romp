@@ -419,6 +419,7 @@ def main(
 ):
     root_logger = logging.getLogger()
     root_logger.setLevel(logging_level_from_verbosity(verbosity))
+    root_logger.addHandler(logging.StreamHandler())
 
     archive_paths = list(itertools.chain.from_iterable(
         glob.glob(path)
