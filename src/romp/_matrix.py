@@ -81,7 +81,7 @@ class Environment:
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=architectures[architecture]
+            architecture=architecture,
         )
 
     def python_binary(self):
@@ -120,7 +120,7 @@ class Environment:
                 'interpreter': self.interpreter,
                 'vmImage': self.vm_image,
                 'versionSpec': self.version,
-                'architecture': self.architecture,
+                'architecture': architectures[self.architecture],
                 'python_binary': self.python_binary(),
                 'python_url': urls.get((
                     self.platform,
