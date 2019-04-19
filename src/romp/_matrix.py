@@ -38,17 +38,20 @@ all_versions = tuple(sorted(set(
 )))
 
 
-all_architectures = (
-    'x86',
-    'x86_64',
-)
+architectures = collections.OrderedDict((
+    ('x86', 'x86'),
+    ('x86_64', 'x64'),
+))
+
+
+all_architectures = tuple(architectures.keys())
 
 
 urls = collections.OrderedDict((
-    (('Linux', 'PyPy', '2.7', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-linux64.tar.bz2'),
-    (('Linux', 'PyPy', '3.5', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-linux64.tar.bz2'),
-    (('macOS', 'PyPy', '2.7', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-osx64.tar.bz2'),
-    (('macOS', 'PyPy', '3.5', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-osx64.tar.bz2'),
+    (('Linux', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-linux64.tar.bz2'),
+    (('Linux', 'PyPy', '3.5', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-linux64.tar.bz2'),
+    (('macOS', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-osx64.tar.bz2'),
+    (('macOS', 'PyPy', '3.5', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-osx64.tar.bz2'),
     (('Windows', 'PyPy', '2.7', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-win32.zip'),
     (('Windows', 'PyPy', '3.5', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-win32.zip'),
 ))
@@ -78,7 +81,7 @@ class Environment:
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=architecture
+            architecture=architectures[architecture]
         )
 
     def python_binary(self):
