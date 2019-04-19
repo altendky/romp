@@ -71,14 +71,14 @@ class Environment:
 
     @classmethod
     def from_string(cls, environment_string):
-        platform, interpreter, version, bit_width = (
+        platform, interpreter, version, architecture = (
             environment_string.split('-')
         )
         return cls(
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=architectures[bit_width]
+            architecture=architecture
         )
 
     def python_binary(self):
