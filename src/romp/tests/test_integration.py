@@ -19,9 +19,9 @@ def test_all():
             '--command', 'python {}'.format(command_name),
             '--interpreter', 'cpYThon',
             '--version', '3.7',
-            '--architecture', '64',
-            '--exclude', 'Windows', 'CPython', '3.7', '64',
-            '--include', 'Linux', 'PyPy', '3.5', '64',
+            '--architecture', 'x86_64',
+            '--exclude', 'Windows', 'CPython', '3.7', 'x86_64',
+            '--include', 'Linux', 'PyPy', '3.5', 'x86_64',
             '--archive-paths-root', here,
             command_path,
             # '--environments', '|'.join((
@@ -51,6 +51,6 @@ def test_failure_fails():
                 '--platform', 'Linux',
                 '--interpreter', 'CPython',
                 '--version', '3.7',
-                '--architecture', '64',
+                '--architecture', 'x86_64',
             ],
         )

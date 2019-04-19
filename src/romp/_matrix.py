@@ -39,8 +39,8 @@ all_versions = tuple(sorted(set(
 
 
 architectures = collections.OrderedDict((
-    ('32', 'x86'),
-    ('64', 'x64'),
+    ('x86', 'x86'),
+    ('x86_64', 'x64'),
 ))
 
 
@@ -48,10 +48,10 @@ all_architectures = tuple(architectures.keys())
 
 
 urls = collections.OrderedDict((
-    (('Linux', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-linux64.tar.bz2'),
-    (('Linux', 'PyPy', '3.5', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-linux64.tar.bz2'),
-    (('macOS', 'PyPy', '2.7', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-osx64.tar.bz2'),
-    (('macOS', 'PyPy', '3.5', 'x64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-osx64.tar.bz2'),
+    (('Linux', 'PyPy', '2.7', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-linux64.tar.bz2'),
+    (('Linux', 'PyPy', '3.5', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-linux64.tar.bz2'),
+    (('macOS', 'PyPy', '2.7', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-osx64.tar.bz2'),
+    (('macOS', 'PyPy', '3.5', 'x86_64'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-osx64.tar.bz2'),
     (('Windows', 'PyPy', '2.7', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy2.7-v7.0.0-win32.zip'),
     (('Windows', 'PyPy', '3.5', 'x86'), 'https://bitbucket.org/pypy/pypy/downloads/pypy3.5-v7.0.0-win32.zip'),
 ))
@@ -74,14 +74,14 @@ class Environment:
 
     @classmethod
     def from_string(cls, environment_string):
-        platform, interpreter, version, bit_width = (
+        platform, interpreter, version, architecture = (
             environment_string.split('-')
         )
         return cls(
             platform=platform,
             interpreter=interpreter,
             version=version,
-            architecture=architectures[bit_width]
+            architecture=architecture,
         )
 
     def python_binary(self):
@@ -120,7 +120,7 @@ class Environment:
                 'interpreter': self.interpreter,
                 'vmImage': self.vm_image,
                 'versionSpec': self.version,
-                'architecture': self.architecture,
+                'architecture': architectures[self.architecture],
                 'python_binary': self.python_binary(),
                 'python_url': urls.get((
                     self.platform,
@@ -157,7 +157,7 @@ def build_all_environments():
         for architecture in all_architectures
         if not (
                 (
-                        architecture == '32'
+                        architecture == 'x86'
                         and (
                                 platform != 'Windows'
                                 or interpreter != 'PyPy'
@@ -166,7 +166,7 @@ def build_all_environments():
                 or (
                         platform == 'Windows'
                         and interpreter == 'PyPy'
-                        and architecture == '64'
+                        and architecture == 'x86_64'
                 )
         )
     ]
