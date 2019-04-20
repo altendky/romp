@@ -45,7 +45,7 @@ jobs:
       - bash: |
           mkdir work
           cd work
-          tar --extract --verbose --file input.tar.gz
+          tar --extract --verbose --file ../input.tar.gz
         displayName: Extract input
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
