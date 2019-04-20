@@ -43,6 +43,7 @@ jobs:
           artifactName: 'input'
           targetPath: $(System.DefaultWorkingDirectory)
       - bash: |
+          mkdir work
           cd work
           tar --extract --verbose --file input.tar.gz
         displayName: Extract input
