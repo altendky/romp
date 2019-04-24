@@ -378,6 +378,11 @@ def logging_level_from_verbosity(verbosity):
 @create_definition_id_option()
 @create_archive_option()
 @create_artifact_option()
+@click.option(
+    '--artifact-paths',
+    type=str,
+    multiple=True,
+)
 @create_matrix_platforms_option()
 @create_matrix_interpreters_option()
 @create_matrix_versions_option()
@@ -407,6 +412,7 @@ def main(
         definition_id,
         archive_file,
         artifact,
+        artifact_paths,
         matrix_platforms,
         matrix_interpreters,
         matrix_versions,
@@ -510,6 +516,7 @@ def main(
         environments=environments_string,
         source_branch=source_branch,
         definition_id=definition_id,
+        artifact_paths=artifact_paths,
     )
 
     click.echo('Waiting for build: {}'.format(build.human_url))
