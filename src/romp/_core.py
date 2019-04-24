@@ -90,7 +90,9 @@ class Build:
 
         response = requests.get(artifact_download_url)
 
-        artifact_file.write(response.content)
+        with tarfile.open(fileobj=response.content) as tar:
+            extracted = tar.extractfile('artifacts.tar.gz')
+            artifact_file.write(extracted.read())
 
 
 def strip_zip_info_prefixes(prefix, zip_infos):

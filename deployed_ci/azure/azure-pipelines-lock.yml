@@ -5,6 +5,7 @@ variables:
   archive_url: ${ROMP_ARCHIVE_URL}
   command: ${ROMP_COMMAND}
   environments: ${ROMP_ENVIRONMENTS}
+  artifact_paths: ${ROMP_ARTIFACT_PATHS}
 
 jobs:
   - job: generate_matrix
@@ -53,10 +54,13 @@ jobs:
       - bash: |
           cd work
           eval $(command)
+          tar --create --verbose --gzip --file ../artifacts.tar.gz ${ROMP_ARTIFACT_PATHS}
         displayName: Run Command
+        env:
+          ROMP_ARTIFACT_PATHS: $(ROMP_ARTIFACT_PATHS)
       - task: CopyFiles@2
         inputs:
-          contents: 'work/requirements/*.txt'
+          contents: 'artifacts.tar.gz'
           targetFolder: $(Build.ArtifactStagingDirectory)
       - task: PublishBuildArtifacts@1
         inputs:
