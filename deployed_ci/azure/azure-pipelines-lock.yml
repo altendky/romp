@@ -43,17 +43,20 @@ jobs:
           artifactName: 'input'
           targetPath: $(System.DefaultWorkingDirectory)
       - bash: |
-          tar --extract --verbose --file input.tar.gz
+          mkdir work
+          cd work
+          tar --extract --verbose --file ../input.tar.gz
         displayName: Extract input
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
       - bash: |
+          cd work
           eval $(command)
         displayName: Run Command
       - task: CopyFiles@2
         inputs:
-          contents: 'requirements/*.txt'
+          contents: 'work/requirements/*.txt'
           targetFolder: $(Build.ArtifactStagingDirectory)
       - task: PublishBuildArtifacts@1
         inputs:
