@@ -3,6 +3,7 @@ import io
 import json
 import logging
 import os
+import os.path
 import tarfile
 import time
 import zipfile
@@ -89,8 +90,13 @@ class Build:
             raise Exception('artifact not found: ' + artifact_name)
 
         response = requests.get(artifact_download_url)
+        i = io.BytesIO(response.content)
 
-        artifact_file.write(response.content)
+        with zipfile.ZipFile(file=i) as artifacts:
+            opened = artifacts.open(
+                os.path.join(artifact_name, 'artifacts.tar.gz'),
+            )
+            artifact_file.write(opened.read())
 
 
 def strip_zip_info_prefixes(prefix, zip_infos):
@@ -143,10 +149,12 @@ def request_remote_lock_build(
         environments,
         source_branch,
         definition_id,
+        artifact_paths,
 ):
     parameters = {
         'ROMP_COMMAND': command,
         'ROMP_ENVIRONMENTS': environments,
+        'ROMP_ARTIFACT_PATHS': ' '.join(path for path in artifact_paths),
     }
 
     if archive_url is not None:
