@@ -54,8 +54,12 @@ jobs:
       - bash: |
           cd work
           eval $(command)
-          tar --create --verbose --gzip --file ../artifacts.tar.gz ${ROMP_ARTIFACT_PATHS}
         displayName: Run Command
+      - bash: |
+          cd work
+          tar --create --verbose --gzip --file ../artifacts.tar.gz ${ROMP_ARTIFACT_PATHS}
+        displayName: Collect artifacts
+        condition: ne($(ROMP_ARTIFACT_PATHS), '')
         env:
           ROMP_ARTIFACT_PATHS: $(ROMP_ARTIFACT_PATHS)
       - task: CopyFiles@2
