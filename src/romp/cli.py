@@ -222,6 +222,20 @@ def create_artifact_option(
     )
 
 
+def create_artifact_paths_option(
+        envvar='ROMP_ARTIFACT_PATHS',
+):
+    return create_option(
+        '--artifact-paths',
+        envvar=envvar,
+        help=(
+            'Paths on remote system to build the artifact archive from.'
+            '  Wildcards are supported via bash.'
+        ),
+        multiple=True,
+    )
+
+
 platforms_choice = Choice(
     choices=romp._matrix.all_platforms,
     case_sensitive=False,
@@ -357,14 +371,61 @@ def create_matrix_exclude_option(
     )
 
 
+def create_archive_paths_root_option(
+        envvar='ROMP_ARCHIVE_PATHS_ROOT',
+):
+    return create_option(
+        '--archive-paths-root',
+        envvar=envvar,
+        help=(
+            'Files in the uploaded archive will be stored with paths'
+            ' relative to this path.'
+        ),
+        type=click.Path(exists=True, file_okay=False),
+    )
+
+
+def create_archive_paths_option(
+        envvar='ROMP_ARCHIVE_PATHS',
+):
+    return create_option(
+        '--archive-path',
+        'archive_paths',
+        envvar=envvar,
+        help=(
+            'Files to include in the archive which will be extracted prior'
+            ' on the remote system prior to running the remote command.'
+        ),
+        multiple=True,
+    )
+
+
+def create_verbose_option(
+        envvar='ROMP_VERBOSITY',
+):
+    return create_option(
+        '--verbose',
+        'verbosity',
+        count=True,
+        envvar=envvar,
+        help='Increase logging verbosity by up to {} levels'.format(
+            len(verbosity_levels) - 1,
+        ),
+        show_default=False,
+    )
+
+
+verbosity_levels = [
+    (2, logging.DEBUG),
+    (1, logging.INFO),
+    (0, logging.WARNING),
+]
+
+
 def logging_level_from_verbosity(verbosity):
-    if verbosity <= 0:
-        return logging.WARNING
-
-    if verbosity <= 1:
-        return logging.INFO
-
-    return logging.DEBUG
+    for verbosity_cutoff, logging_level in verbosity_levels:
+        if verbosity >= verbosity_cutoff:
+            return logging_level
 
 
 @click.command()
@@ -378,29 +439,16 @@ def logging_level_from_verbosity(verbosity):
 @create_definition_id_option()
 @create_archive_option()
 @create_artifact_option()
-@click.option(
-    '--artifact-paths',
-    type=str,
-    multiple=True,
-)
+@create_artifact_paths_option()
 @create_matrix_platforms_option()
 @create_matrix_interpreters_option()
 @create_matrix_versions_option()
 @create_matrix_architectures_option()
 @create_matrix_include_option()
 @create_matrix_exclude_option()
-@click.option(
-    '--archive-paths-root',
-    envvar='ROMP_ARCHIVE_PATHS_ROOT',
-    help='',
-    type=click.Path(exists=True, file_okay=False),
-)
-@click.argument(
-    'archive_paths',
-    type=str,
-    nargs=-1,
-)
-@click.option('--verbose', 'verbosity', count=True)
+@create_archive_paths_root_option()
+@create_archive_paths_option()
+@create_verbose_option()
 def main(
         personal_access_token,
         build_request_url,
