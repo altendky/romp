@@ -92,15 +92,16 @@ jobs:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: 3.7
+          architecture: x64
       - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'coalesce'
           downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
-          mkdir work
-          cd work
-          find ../coalesce -name 'artifacts.*.tar.gz' | xargs -i tar --extract --verbose --gzip --file {}
-          tar --create --verbose --gzip --file ../artifacts.tar.gz *
+          python deployed_ci/azure/coalesce_artifacts.py --source-directory coalesce --target artifacts.tar.gz
         displayName: Build archive
       - task: CopyFiles@2
         inputs:
