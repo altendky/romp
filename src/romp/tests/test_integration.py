@@ -94,6 +94,6 @@ def test_artifacts_coalesced():
             }
 
     assert contents == {
-        ('red', '3.7'),
-        ('red', '3.6'),
+        (b'red', b'3.7'),
+        (b'red', b'3.6'),
     }
