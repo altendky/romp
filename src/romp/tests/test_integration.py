@@ -1,6 +1,8 @@
 import os.path
 import subprocess
 import sys
+import tarfile
+import tempfile
 
 import pytest
 
@@ -54,3 +56,44 @@ def test_failure_fails():
                 '--architecture', 'x86_64',
             ],
         )
+
+
+def test_artifacts_coalesced():
+    with tempfile.NamedTemporaryFile(delete=False) as temporary_file:
+        temporary_file.close()
+        artifact_archive_path = temporary_file.name
+
+        command = '; '.join((
+            'echo red > ${UUID}.txt',
+            (
+                'python -c'
+                """ 'import sys; print(".".join(str(v) for v in sys.version_info[:2]))'"""
+                ' >> ${UUID}.txt'
+            )
+        ))
+
+        subprocess.check_call(
+            [
+                sys.executable,
+                '-m', 'romp',
+                '--command', command,
+                '--platform', 'Linux',
+                '--interpreter', 'CPython',
+                '--version', '3.6',
+                '--version', '3.7',
+                '--architecture', 'x86_64',
+                '--artifact-paths', '*.txt',
+                '--artifact', artifact_archive_path,
+            ],
+        )
+
+        with tarfile.open(name=artifact_archive_path, mode='r:gz') as tar:
+            contents = {
+                tuple(tar.extractfile(info).read().strip().splitlines)
+                for info in tar.getmembers()
+            }
+
+    assert contents == {
+        ('red', '3.7'),
+        ('red', '3.6'),
+    }
