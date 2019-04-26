@@ -99,7 +99,7 @@ jobs:
       - bash: |
           mkdir work
           cd work
-          ls ../coalesce/artifacts.*.tar.gz | xargs -i tar --extract --verbose --gzip --file {}
+          find ../coalesce -name 'artifacts.*.tar.gz' | xargs -i tar --extract --verbose --gzip --file {}
           tar --create --verbose --gzip --file ../artifacts.tar.gz *
         displayName: Build archive
       - task: CopyFiles@2
