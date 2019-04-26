@@ -89,7 +89,7 @@ def test_artifacts_coalesced():
 
         with tarfile.open(name=artifact_archive_path, mode='r:gz') as tar:
             contents = {
-                tuple(tar.extractfile(info).read().strip().splitlines)
+                tuple(tar.extractfile(info).read().strip().splitlines())
                 for info in tar.getmembers()
             }
 
