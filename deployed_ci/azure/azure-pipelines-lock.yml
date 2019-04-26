@@ -9,7 +9,7 @@ variables:
 
 jobs:
   - job: generate_matrix
-    displayName: Generate Matrix
+    displayName: Generate matrix
     steps:
       - bash: |
           python src/romp/_matrix.py --environments ${ROMP_ENVIRONMENTS}
@@ -67,7 +67,7 @@ jobs:
           UUID: $[ variables.uuid ]
       - task: CopyFiles@2
         inputs:
-          contents: 'artifacts.$(variables.uuid).tar.gz'
+          contents: artifacts.$(variables.uuid).tar.gz
           targetFolder: $(Build.ArtifactStagingDirectory)
       - task: PublishBuildArtifacts@1
         inputs:
@@ -75,7 +75,7 @@ jobs:
           artifactName: coalesce
 
   - job: coalesce_artifacts
-    displayName: Coalesce Artifacts
+    displayName: Coalesce artifacts
     dependsOn: romp_on
     pool:
       vmImage: 'ubuntu-16.04'
