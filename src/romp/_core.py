@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import os.path
+import posixpath
 import tarfile
 import time
 import zipfile
@@ -94,8 +95,7 @@ class Build:
 
         with zipfile.ZipFile(file=i) as artifacts:
             opened = artifacts.open(
-                # os.path.join failes on Windows so...
-                '/'.join((artifact_name, 'artifacts.tar.gz')),
+                posixpath.join(artifact_name, 'artifacts.tar.gz'),
             )
             with opened as f:
                 artifact_file.write(f.read())
