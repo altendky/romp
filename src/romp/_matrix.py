@@ -6,6 +6,7 @@ import collections
 import itertools
 import json
 import sys
+import uuid
 
 
 vm_images = collections.OrderedDict((
@@ -130,6 +131,7 @@ class Environment:
                 ), ''),
                 'extracter': extracters[self.platform],
                 'TOXENV': self.tox_env(),
+                'uuid': str(uuid.uuid4()),
             },
         )
 

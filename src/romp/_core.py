@@ -76,7 +76,7 @@ class Build:
         )
         response.raise_for_status()
 
-        artifact_name = 'lock_files'
+        artifact_name = 'artifacts'
 
         response_json = response.json()
         for artifact in response_json['value']:
