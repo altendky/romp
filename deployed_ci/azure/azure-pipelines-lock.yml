@@ -27,6 +27,17 @@ jobs:
         inputs:
           artifactName: 'input'
           targetPath: '$(System.DefaultWorkingDirectory)/input.tar.gz'
+      - bash: |
+          touch __filler__
+        displayName: Create __filler__
+      - task: CopyFiles@2
+        inputs:
+          contents: '__filler__'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: coalesce
 
   - job: romp_on
     displayName: romp on
