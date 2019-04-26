@@ -88,7 +88,7 @@ jobs:
       - bash: |
           mkdir work
           cd work
-          tar -xvzf ../coalesce/artifacts.*.tar.gz
+          ls ../coalesce/artifacts.*.tar.gz | xargs -i tar --extract --verbose --gzip --file {}
           tar --create --verbose --gzip --file ../artifacts.tar.gz *
         displayName: Build archive
       - task: CopyFiles@2
