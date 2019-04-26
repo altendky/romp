@@ -86,10 +86,9 @@ jobs:
           artifactName: 'coalesce'
           downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
-          ls -l
           mkdir work
           cd work
-          tar -xvzf ../artifacts.*.tar.gz
+          tar -xvzf ../coalesce/artifacts.*.tar.gz
           tar --create --verbose --gzip --file ../artifacts.tar.gz *
         displayName: Build archive
       - task: CopyFiles@2
