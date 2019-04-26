@@ -95,7 +95,7 @@ class Build:
         with zipfile.ZipFile(file=i) as artifacts:
             opened = artifacts.open(
                 # os.path.join failes on Windows so...
-                '/'.join(artifact_name, 'artifacts.tar.gz'),
+                '/'.join((artifact_name, 'artifacts.tar.gz')),
             )
             with opened as f:
                 artifact_file.write(f.read())
