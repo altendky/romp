@@ -6,6 +6,7 @@ import collections
 import itertools
 import json
 import sys
+import uuid
 
 
 vm_images = collections.OrderedDict((
@@ -108,6 +109,8 @@ class Environment:
         return env
 
     def to_matrix_entry(self):
+        entry_uuid = str(uuid.uuid4())
+
         return (
             '{platform} {interpreter} {version} {architecture}'.format(
                 platform=self.platform,
@@ -130,6 +133,8 @@ class Environment:
                 ), ''),
                 'extracter': extracters[self.platform],
                 'TOXENV': self.tox_env(),
+                'uuid': entry_uuid,
+                'artifacts_archive': 'artifacts.{}.tar.gz'.format(entry_uuid),
             },
         )
 

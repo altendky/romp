@@ -9,7 +9,7 @@ variables:
 
 jobs:
   - job: generate_matrix
-    displayName: Generate Matrix
+    displayName: Generate matrix
     steps:
       - bash: |
           python src/romp/_matrix.py --environments ${ROMP_ENVIRONMENTS}
@@ -27,6 +27,17 @@ jobs:
         inputs:
           artifactName: 'input'
           targetPath: '$(System.DefaultWorkingDirectory)/input.tar.gz'
+      - bash: |
+          touch __filler__
+        displayName: Create __filler__
+      - task: CopyFiles@2
+        inputs:
+          contents: '__filler__'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: coalesce
 
   - job: romp_on
     displayName: romp on
@@ -55,13 +66,43 @@ jobs:
           cd work
           eval $(command)
         displayName: Run Command
+        env:
+          UUID: $[ variables.uuid ]
       - bash: |
           cd work
-          tar --create --verbose --gzip --file ../artifacts.tar.gz ${ROMP_ARTIFACT_PATHS}
+          tar --create --verbose --gzip --file ../${ARTIFACTS_ARCHIVE} ${ROMP_ARTIFACT_PATHS}
         displayName: Collect artifacts
         condition: ne(variables.ROMP_ARTIFACT_PATHS, '')
         env:
           ROMP_ARTIFACT_PATHS: $(ROMP_ARTIFACT_PATHS)
+          UUID: $[ variables.uuid ]
+          ARTIFACTS_ARCHIVE: $[ variables.artifacts_archive ]
+      - task: CopyFiles@2
+        inputs:
+          contents: 'artifacts.*.tar.gz'
+          targetFolder: $(Build.ArtifactStagingDirectory)
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: $(Build.ArtifactStagingDirectory)
+          artifactName: coalesce
+
+  - job: coalesce_artifacts
+    displayName: Coalesce artifacts
+    dependsOn: romp_on
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: 3.7
+          architecture: x64
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          artifactName: 'coalesce'
+          downloadPath: $(System.DefaultWorkingDirectory)
+      - bash: |
+          python deployed_ci/azure/coalesce_artifacts.py --source-directory coalesce --target artifacts.tar.gz
+        displayName: Build archive
       - task: CopyFiles@2
         inputs:
           contents: 'artifacts.tar.gz'
@@ -69,4 +110,4 @@ jobs:
       - task: PublishBuildArtifacts@1
         inputs:
           pathToPublish: $(Build.ArtifactStagingDirectory)
-          artifactName: lock_files
+          artifactName: artifacts

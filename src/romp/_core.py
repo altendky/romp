@@ -4,6 +4,7 @@ import json
 import logging
 import os
 import os.path
+import posixpath
 import tarfile
 import time
 import zipfile
@@ -76,7 +77,7 @@ class Build:
         )
         response.raise_for_status()
 
-        artifact_name = 'lock_files'
+        artifact_name = 'artifacts'
 
         response_json = response.json()
         for artifact in response_json['value']:
@@ -94,9 +95,10 @@ class Build:
 
         with zipfile.ZipFile(file=i) as artifacts:
             opened = artifacts.open(
-                os.path.join(artifact_name, 'artifacts.tar.gz'),
+                posixpath.join(artifact_name, 'artifacts.tar.gz'),
             )
-            artifact_file.write(opened.read())
+            with opened as f:
+                artifact_file.write(f.read())
 
 
 def strip_zip_info_prefixes(prefix, zip_infos):
