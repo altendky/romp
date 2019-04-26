@@ -81,14 +81,10 @@ jobs:
     pool:
       vmImage: 'ubuntu-16.04'
     steps:
-      - task: DownloadPipelineArtifact@0
+      - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'coalesce'
-          targetPath: $(System.DefaultWorkingDirectory)
-      - task: UsePythonVersion@0
-        inputs:
-          versionSpec: 3.7
-          architecture: x64
+          downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
           mkdir work
           cd work
