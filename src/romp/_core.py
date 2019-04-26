@@ -94,9 +94,11 @@ class Build:
 
         with zipfile.ZipFile(file=i) as artifacts:
             opened = artifacts.open(
-                os.path.join(artifact_name, 'artifacts.tar.gz'),
+                # os.path.join failes on Windows so...
+                '/'.join(artifact_name, 'artifacts.tar.gz'),
             )
-            artifact_file.write(opened.read())
+            with opened as f:
+                artifact_file.write(f.read())
 
 
 def strip_zip_info_prefixes(prefix, zip_infos):
