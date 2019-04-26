@@ -68,7 +68,7 @@ jobs:
           ARTIFACTS_ARCHIVE: $[ variables.artifacts_archive ]
       - task: CopyFiles@2
         inputs:
-          contents: $[ variables.artifacts_archive ]
+          contents: 'artifacts.*.tar.gz'
           targetFolder: $(Build.ArtifactStagingDirectory)
       - task: PublishBuildArtifacts@1
         inputs:
