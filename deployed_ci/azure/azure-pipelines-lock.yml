@@ -86,6 +86,7 @@ jobs:
           artifactName: 'coalesce'
           downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
+          ls -l
           mkdir work
           cd work
           tar -xvzf ../artifacts.*.tar.gz
