@@ -238,8 +238,9 @@ def main():
         for environment in build_all_environments()
         if not (
             environment.platform == 'Windows'
-            and environment.architecture == 'x86'
+            and environment.interpreter == 'CPython'
             and environment.version != '3.7'
+            and environment.architecture == 'x86'
         )
     ]
 
