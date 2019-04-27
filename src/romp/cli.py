@@ -13,6 +13,7 @@ import click.types
 
 import romp._core
 import romp._matrix
+import romp._version
 
 
 logger = logging.getLogger(__name__)
@@ -181,9 +182,16 @@ def create_check_period_option(
 def create_source_branch_option(
         envvar='ROMP_SOURCE_BRANCH',
 ):
+    version = romp._version.get_versions()['version']
+
+    if '+g' in version:
+        default = 'develop'
+    else:
+        default = 'refs/tags/v{}'.format(version)
+
     return create_option(
         '--source-branch',
-        default='develop',
+        default=default,
         envvar=envvar,
         help='The romp source branch to use for the build',
     )
