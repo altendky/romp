@@ -175,13 +175,31 @@ def request_remote_lock_build(
         },
     )
 
-    logger.info('response-----')
-    logger.info('status: %s', response.status_code)
-    logger.info('text:')
-    logger.info(response.text)
-    response.raise_for_status()
-    response_json = response.json()
-    logger.info('json:')
-    logger.info(json.dumps(response_json, indent=4))
+    try:
+        response_json = response.json()
+    except json.JSONDecodeError:
+        response_json_text = '<failed to decode JSON>'
+    else:
+        response_json_text = json.dumps(response_json, indent=4)
+
+    to_be_logged = [
+        ['    response-----'],
+        ['    status: %s', response.status_code],
+        ['    text:'],
+        [response.text],
+        ['    json:'],
+        [response_json_text],
+    ]
+
+    try:
+        response.raise_for_status()
+    except Exception:
+        for parameters in to_be_logged:
+            logger.critical(*parameters)
+
+        raise
+
+    for parameters in to_be_logged:
+        logger.info(*parameters)
 
     return Build.from_response_json(response_json=response_json)
