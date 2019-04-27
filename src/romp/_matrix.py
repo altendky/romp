@@ -165,7 +165,6 @@ def build_all_environments():
                         architecture == 'x86'
                         and (
                                 platform != 'Windows'
-                                or interpreter != 'PyPy'
                         )
                 )
                 or (
@@ -234,9 +233,19 @@ def main():
     )
     parser.set_defaults(func=parser.print_help)
 
+    test_environments = [
+        environment
+        for environment in build_all_environments()
+        if not (
+            environment.platform == 'Windows'
+            and environment.architecture == 'x86'
+            and environment.version != '3.7'
+        )
+    ]
+
     parser.add_argument(
         '--environments',
-        default=string_from_environments(build_all_environments()),
+        default=string_from_environments(test_environments),
     )
 
     args = parser.parse_args()
