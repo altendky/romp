@@ -54,6 +54,8 @@ jobs:
           python -m pip install tox
         displayName: Install tox
       - bash: |
+          ls -l
+          tree dist
           tox --installpkg dist/*.whl
         displayName: tox
         env:
