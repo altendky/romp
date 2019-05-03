@@ -30,7 +30,7 @@ jobs:
         displayName: Build Wheel
       - task: PublishPipelineArtifact@0
         inputs:
-          artifactName: 'dist'
+          artifactName: 'artifact'
           targetPath: '$(System.DefaultWorkingDirectory)/dist/'
 
   - job: test
