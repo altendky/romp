@@ -25,6 +25,8 @@ jobs:
           python -m pip install wheel
           python setup.py sdist
           python setup.py bdist_wheel
+          mkdir artifact
+          mv dist artifact
         displayName: Build Wheel
       - task: PublishPipelineArtifact@0
         inputs:
