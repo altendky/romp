@@ -45,10 +45,10 @@ jobs:
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
       - template: deployed_ci/azure/templates/tasks/get_python.yml
-      - task: DownloadPipelineArtifact@0
+      - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'dist'
-          targetPath: $(System.DefaultWorkingDirectory)
+          downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
@@ -83,10 +83,10 @@ jobs:
         inputs:
           versionSpec: 3.7
           architecture: x64
-      - task: DownloadPipelineArtifact@0
+      - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'dist'
-          targetPath: $(System.DefaultWorkingDirectory)
+          downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
           python -m venv venv
           venv/bin/pip install twine
