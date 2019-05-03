@@ -28,10 +28,10 @@ jobs:
           mkdir artifact
           mv dist artifact
         displayName: Build Wheel
-      - task: PublishPipelineArtifact@0
+      - task: PublishBuildArtifacts@1
         inputs:
-          artifactName: 'dist'
-          targetPath: '$(System.DefaultWorkingDirectory)/artifact/'
+          pathToPublish: '$(System.DefaultWorkingDirectory)/artifact/'
+          artifactName: dist
 
   - job: test
     displayName: Test
@@ -91,14 +91,6 @@ jobs:
           python -m venv venv
           venv/bin/pip install twine
         displayName: Build venv
-      - task: CopyFiles@2
-        inputs:
-          contents: 'dist/*'
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathToPublish: $(Build.ArtifactStagingDirectory)
-          artifactName: dist
       - bash: |
           venv/bin/python twineontag.py
         env:
