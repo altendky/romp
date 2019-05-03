@@ -25,12 +25,10 @@ jobs:
           python -m pip install wheel
           python setup.py sdist
           python setup.py bdist_wheel
-          mkdir artifact
-          mv dist artifact
         displayName: Build Wheel
       - task: PublishBuildArtifacts@1
         inputs:
-          pathToPublish: '$(System.DefaultWorkingDirectory)/artifact/'
+          pathToPublish: '$(System.DefaultWorkingDirectory)/dist/'
           artifactName: dist
 
   - job: test
