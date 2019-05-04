@@ -12,9 +12,30 @@ jobs:
           python src/romp/_matrix.py
         name: generate_matrix
 
+  - job: dist
+    displayName: Build Wheel and sdist
+    pool:
+      vmImage: 'ubuntu-16.04'
+    steps:
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: 3.7
+          architecture: x64
+      - bash: |
+          python -m pip install wheel
+          python setup.py sdist
+          python setup.py bdist_wheel
+        displayName: Build Wheel
+      - task: PublishBuildArtifacts@1
+        inputs:
+          pathToPublish: '$(System.DefaultWorkingDirectory)/dist/'
+          artifactName: dist
+
   - job: test
     displayName: Test
-    dependsOn: generate_matrix
+    dependsOn:
+      - generate_matrix
+      - dist
     pool:
       vmImage: $[ variables.vmImage ]
     strategy:
@@ -22,6 +43,10 @@ jobs:
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
       - template: deployed_ci/azure/templates/tasks/get_python.yml
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          artifactName: 'dist'
+          downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
@@ -29,7 +54,7 @@ jobs:
           python -m pip install tox
         displayName: Install tox
       - bash: |
-          tox
+          tox --installpkg dist/*.whl
         displayName: tox
         env:
           ROMP_PERSONAL_ACCESS_TOKEN: $(ROMP_PERSONAL_ACCESS_TOKEN)
@@ -44,8 +69,8 @@ jobs:
         env:
           CODECOV_TOKEN: $(CODECOV_TOKEN)
 
-  - job: build_and_deploy
-    displayName: Build And Deploy
+  - job: publish
+    displayName: Publish
     dependsOn: test
     pool:
       vmImage: 'ubuntu-16.04'
@@ -54,22 +79,14 @@ jobs:
         inputs:
           versionSpec: 3.7
           architecture: x64
+      - task: DownloadBuildArtifacts@0
+        inputs:
+          artifactName: 'dist'
+          downloadPath: $(System.DefaultWorkingDirectory)
       - bash: |
           python -m venv venv
           venv/bin/pip install twine
-          venv/bin/pip install wheel
         displayName: Build venv
-      - bash: |
-          venv/bin/python setup.py bdist_wheel
-        displayName: Build Wheel
-      - task: CopyFiles@2
-        inputs:
-          contents: 'dist/*'
-          targetFolder: $(Build.ArtifactStagingDirectory)
-      - task: PublishBuildArtifacts@1
-        inputs:
-          pathToPublish: $(Build.ArtifactStagingDirectory)
-          artifactName: dist
       - bash: |
           venv/bin/python twineontag.py
         env:

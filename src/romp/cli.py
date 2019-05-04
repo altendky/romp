@@ -202,7 +202,7 @@ def create_definition_id_option(
 ):
     return create_option(
         '--definition-id',
-        default=3,
+        default=5,
         envvar=envvar,
         help='The definition id of the build to be triggered',
     )
