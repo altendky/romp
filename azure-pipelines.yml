@@ -67,7 +67,7 @@ jobs:
           ROMP_SOURCE_BRANCH: $(Build.SourceBranch)
           TOXENV: $[ variables.TOXENV ]
       - bash: |
-          tox -e codecov
+          python -m tox -e codecov
         displayName: codecov
         env:
           CODECOV_TOKEN: $(CODECOV_TOKEN)
