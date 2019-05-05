@@ -57,7 +57,7 @@ jobs:
           python -m pip install tox
         displayName: Install tox
       - bash: |
-          tox --installpkg dist/*.whl
+          python -m tox --installpkg dist/*.whl
         displayName: tox
         env:
           ROMP_PERSONAL_ACCESS_TOKEN: $(ROMP_PERSONAL_ACCESS_TOKEN)
