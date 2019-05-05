@@ -44,8 +44,8 @@ jobs:
     steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: $(variables.versionSpec)
-          architecture: $(variables.architecture)
+          versionSpec: $(versionSpec)
+          architecture: $(architecture)
       - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'dist'
