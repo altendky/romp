@@ -42,7 +42,10 @@ jobs:
       maxParallel: 4
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
-      - template: deployed_ci/azure/templates/tasks/get_python.yml
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: $(versionSpec)
+          architecture: $(architecture)
       - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'dist'
@@ -51,10 +54,10 @@ jobs:
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
       - bash: |
-          python -m pip install tox
+          python -m pip install tox pytest-azurepipelines
         displayName: Install tox
       - bash: |
-          tox --installpkg dist/*.whl
+          python -m tox -e ${TOXENV} --installpkg dist/*.whl
         displayName: tox
         env:
           ROMP_PERSONAL_ACCESS_TOKEN: $(ROMP_PERSONAL_ACCESS_TOKEN)
@@ -64,7 +67,7 @@ jobs:
           ROMP_SOURCE_BRANCH: $(Build.SourceBranch)
           TOXENV: $[ variables.TOXENV ]
       - bash: |
-          tox -e codecov
+          python -m tox -e codecov
         displayName: codecov
         env:
           CODECOV_TOKEN: $(CODECOV_TOKEN)

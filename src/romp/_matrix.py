@@ -85,28 +85,22 @@ class Environment:
             architecture=architecture,
         )
 
-    def python_binary(self):
-        if self.interpreter == 'CPython':
-            binary = 'python'
-        elif self.interpreter == 'PyPy':
-            binary = 'pypy'
-
-            if self.version.startswith('3'):
-                binary += '3'
-
-        if self.platform == 'Windows':
-            binary += '.exe'
-
-        return binary
-
     def tox_env(self):
         env = 'py'
         if self.interpreter == 'PyPy':
             env += 'py'
-
-        env += self.version.replace('.', '')
+            if self.version[0] == '3':
+                env += '3'
+        else:
+            env += self.version.replace('.', '')
 
         return env
+
+    def matrix_version(self):
+        if self.interpreter == 'CPython':
+            return self.version
+
+        return 'pypy{}'.format(self.version[0])
 
     def to_matrix_entry(self):
         entry_uuid = str(uuid.uuid4())
@@ -120,11 +114,9 @@ class Environment:
             ),
             {
                 'platform': self.platform,
-                'interpreter': self.interpreter,
                 'vmImage': self.vm_image,
-                'versionSpec': self.version,
+                'versionSpec': self.matrix_version(),
                 'architecture': architectures[self.architecture],
-                'python_binary': self.python_binary(),
                 'python_url': urls.get((
                     self.platform,
                     self.interpreter,
