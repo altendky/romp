@@ -155,19 +155,6 @@ def create_username_option(
     )
 
 
-def create_environments_option(
-        envvar='ROMP_ENVIRONMENTS',
-):
-    return create_option(
-        '--environments',
-        envvar=envvar,
-        help=(
-            'Targets to run on.  Mostly use the matrix options instead.'
-            '  This may be removed.'
-        ),
-    )
-
-
 def create_check_period_option(
         envvar='ROMP_CHECK_PERIOD',
 ):
@@ -441,7 +428,6 @@ def logging_level_from_verbosity(verbosity):
 @create_build_request_url_option()
 @create_command_option()
 @create_username_option()
-@create_environments_option()
 @create_check_period_option()
 @create_source_branch_option()
 @create_definition_id_option()
@@ -462,7 +448,6 @@ def main(
         build_request_url,
         command,
         username,
-        environments,
         check_period,
         source_branch,
         definition_id,
@@ -487,22 +472,6 @@ def main(
         glob.glob(path)
         for path in archive_paths
     ))
-
-    matrix_specified = any(
-        len(dimension) > 0
-        for dimension in (
-            matrix_platforms,
-            matrix_interpreters,
-            matrix_versions,
-            matrix_architectures,
-        )
-    )
-
-    if environments is not None and matrix_specified:
-        # TODO: this isn't really nice, maybe drop environments all together?
-        #       or maybe it turns into '--include Windows,CPython,3.7,6.4' etc?
-        click.echo('Specify either an environments list or matrix parameters')
-        sys.exit(1)
 
     if archive_file is not None and len(archive_paths) > 0:
         click.echo('Specify either an archive file or archive paths')
