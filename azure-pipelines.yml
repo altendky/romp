@@ -54,10 +54,10 @@ jobs:
           python -c 'import sys; print(sys.version); print(sys.platform)'
         displayName: Report Python version
       - bash: |
-          python -m pip install tox
+          python -m pip install tox pytest-azurepipelines
         displayName: Install tox
       - bash: |
-          python -m tox --installpkg dist/*.whl
+          python -m tox -e ${TOXENV} --installpkg dist/*.whl
         displayName: tox
         env:
           ROMP_PERSONAL_ACCESS_TOKEN: $(ROMP_PERSONAL_ACCESS_TOKEN)
