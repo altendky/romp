@@ -98,10 +98,7 @@ class Environment:
         if self.interpreter == 'CPython':
             return self.version
 
-        if self.version[0] == '2':
-            return 'pypy'
-
-        return 'pypy3'
+        return 'pypy{}'.format(self.version[0])
 
     def to_matrix_entry(self):
         entry_uuid = str(uuid.uuid4())
