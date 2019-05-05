@@ -42,7 +42,10 @@ jobs:
       maxParallel: 4
       matrix: $[ dependencies.generate_matrix.outputs['generate_matrix.JobsToRun'] ]
     steps:
-      - template: deployed_ci/azure/templates/tasks/get_python.yml
+      - task: UsePythonVersion@0
+        inputs:
+          versionSpec: $[ variables.versionSpec ]
+          architecture: $[ variables.architecture ]
       - task: DownloadBuildArtifacts@0
         inputs:
           artifactName: 'dist'
