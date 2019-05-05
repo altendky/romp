@@ -89,8 +89,10 @@ class Environment:
         env = 'py'
         if self.interpreter == 'PyPy':
             env += 'py'
-
-        env += self.version.replace('.', '')
+            if self.version[0] == 3:
+                env += '3'
+        else:
+            env += self.version.replace('.', '')
 
         return env
 
