@@ -195,15 +195,61 @@ def create_definition_id_option(
     )
 
 
-def create_archive_option(
+import attr
+
+
+# @attr.s
+# class ExclusiveType:
+#     type = attr.ib()
+
+
+@attr.s
+class ExclusiveOptionGroup:
+    options = attr.ib(factory=list)
+
+    # @functools.wraps(click.option)
+    # def __call__(self, *args, **kwargs):
+    #     self.add_option(click.option(*args, **kwargs))
+
+    def add_option(self, option):
+        self.options.append((option, option.callback))
+        option.callback = self.callback
+
+    def callback(self, ctx, param, value):
+        for option, callback in self.options:
+            if option is param:
+                break
+        else:
+             raise MakeAnExceptionError()
+
+        print()
+
+archive_file_paths_exclusive_group = ExclusiveOptionGroup()
+
+
+# def archive_file_callback(ctx, param, value):
+#     archive_file_paths_conflict_check(
+#         file=value,
+#         paths=ctx.params.get('archive_paths', ()),
+#         message='Exclusive with --archive-path, specify only one.',
+#     )
+#
+#     return value
+
+
+def create_archive_file_option(
         envvar='ROMP_ARCHIVE',
 ):
-    return create_option(
+    option = create_option(
         '--archive-file',
         envvar=envvar,
         help='The archive to be uploaded to the build',
         type=click.File('rb'),
     )
+
+    archive_file_paths_exclusive_group.add_option(option)
+
+    return option
 
 
 def create_artifact_option(
@@ -380,10 +426,28 @@ def create_archive_paths_root_option(
     )
 
 
+# def archive_file_paths_conflict_check(file, paths, message):
+#     if file is not None and paths != ():
+#         raise click.BadParameter(message=message)
+#
+#
+# def archive_paths_callback(ctx, param, value):
+#     archive_file_paths_conflict_check(
+#         file=ctx.params.get('archive_file'),
+#         paths=value,
+#         message='Exclusive with --archive-file, specify only one.',
+#     )
+#
+#     return list(itertools.chain.from_iterable(
+#         glob.glob(path)
+#         for path in value
+#     ))
+
+
 def create_archive_paths_option(
         envvar='ROMP_ARCHIVE_PATHS',
 ):
-    return create_option(
+    option = create_option(
         '--archive-path',
         'archive_paths',
         envvar=envvar,
@@ -393,6 +457,10 @@ def create_archive_paths_option(
         ),
         multiple=True,
     )
+
+    archive_file_paths_exclusive_group.add_option(option)
+
+    return option
 
 
 def create_verbose_option(
@@ -431,7 +499,7 @@ def logging_level_from_verbosity(verbosity):
 @create_check_period_option()
 @create_source_branch_option()
 @create_definition_id_option()
-@create_archive_option()
+@create_archive_file_option()
 @create_artifact_option()
 @create_artifact_paths_option()
 @create_matrix_platforms_option()
@@ -467,15 +535,6 @@ def main(
     root_logger = logging.getLogger()
     root_logger.setLevel(logging_level_from_verbosity(verbosity))
     root_logger.addHandler(logging.StreamHandler())
-
-    archive_paths = list(itertools.chain.from_iterable(
-        glob.glob(path)
-        for path in archive_paths
-    ))
-
-    if archive_file is not None and len(archive_paths) > 0:
-        click.echo('Specify either an archive file or archive paths')
-        sys.exit(1)
 
     environments = romp._matrix.build_environments(
         platforms=matrix_platforms,

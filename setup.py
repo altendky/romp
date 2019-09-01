@@ -50,7 +50,7 @@ setuptools.setup(
         ],
     },
     install_requires=[
-        # 'attrs',
+        'attrs',
         'click',
         'requests',
     ],
