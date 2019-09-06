@@ -594,7 +594,7 @@ def main(
     finally:
         if wormhole_process is not None:
             wormhole_process.poll()
-            if wormhole_process.return_code != 0:
+            if wormhole_process.returncode != 0:
                 click.echo('Wormhole still open...  killing now')
                 wormhole_process.kill()
 
