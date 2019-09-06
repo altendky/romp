@@ -2,7 +2,7 @@ trigger: none
 pr: none
 
 variables:
-  archive_url: ${ROMP_ARCHIVE_URL}
+  wormhole_code: ${ROMP_WORMHOLE_CODE}
   command: ${ROMP_COMMAND}
   environments: ${ROMP_ENVIRONMENTS}
   artifact_paths: ${ROMP_ARTIFACT_PATHS}
@@ -21,7 +21,7 @@ jobs:
     displayName: Get input archive
     steps:
       - bash: |
-          if [[ -z "$(archive_url)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else curl --silent --show-error "$(archive_url)" --output input.tar.gz; fi
+          if [[ -z "$(wormhole_code)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else pip install wormhole; wormhole receive "$(wormhole_code)" --output-file input.tar.gz; fi
         displayName: Get input archive
       - task: PublishPipelineArtifact@0
         inputs:

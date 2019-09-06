@@ -52,6 +52,7 @@ setuptools.setup(
     install_requires=[
         # 'attrs',
         'click',
+        'magic-wormhole',
         'requests',
     ],
     extras_require={

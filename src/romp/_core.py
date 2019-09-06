@@ -143,7 +143,7 @@ def post_file(data):
 
 
 def request_remote_lock_build(
-        archive_url,
+        wormhole_code,
         username,
         personal_access_token,
         build_request_url,
@@ -159,8 +159,8 @@ def request_remote_lock_build(
         'ROMP_ARTIFACT_PATHS': ' '.join(path for path in artifact_paths),
     }
 
-    if archive_url is not None:
-        parameters['ROMP_ARCHIVE_URL'] = archive_url
+    if wormhole_code is not None:
+        parameters['ROMP_WORMHOLE_CODE'] = wormhole_code
 
     response = requests.post(
         url=build_request_url,

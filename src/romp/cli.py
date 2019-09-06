@@ -6,6 +6,7 @@ import io
 import itertools
 import json
 import logging
+import subprocess
 import sys
 
 import click
@@ -543,7 +544,6 @@ def main(
 
     environments_string = romp._matrix.string_from_environments(environments)
 
-    archive_url = None
     archive_bytes = None
     if archive_file is not None:
         archive_bytes = archive_file.read()
@@ -557,23 +557,46 @@ def main(
         )
         archive_bytes = archive_bytesio.getvalue()
 
-    if archive_bytes is not None:
-        click.echo('Uploading archive')
-        archive_url = romp._core.post_file(data=archive_bytes)
-        click.echo('Archive URL: {}'.format(archive_url))
+    if archive_bytes is None:
+        wormhole_code = ''
+        wormhole_process = None
+    else:
+        wormhole_code = '42'
+        click.echo('Opening wormhole')
+        entry_point_run_code = (
+            "import pkg_resources"
+            "; pkg_resources.load_entry_point("
+            "'magic-wormhole', 'console_scripts', 'wormhole'"
+            ")()"
+        )
+        wormhole_process = subprocess.Popen(
+            [
+                sys.executable,
+                '-c', entry_point_run_code,
+                'send',
+                '--code', wormhole_code,
+            ]
+        )
 
-    click.echo('Requesting build')
-    build = romp._core.request_remote_lock_build(
-        archive_url=archive_url,
-        username=username,
-        personal_access_token=personal_access_token,
-        build_request_url=build_request_url,
-        command=command,
-        environments=environments_string,
-        source_branch=source_branch,
-        definition_id=definition_id,
-        artifact_paths=artifact_paths,
-    )
+    try:
+        click.echo('Requesting build')
+        build = romp._core.request_remote_lock_build(
+            wormhole_code=wormhole_code,
+            username=username,
+            personal_access_token=personal_access_token,
+            build_request_url=build_request_url,
+            command=command,
+            environments=environments_string,
+            source_branch=source_branch,
+            definition_id=definition_id,
+            artifact_paths=artifact_paths,
+        )
+    finally:
+        if wormhole_process is not None:
+            wormhole_process.poll()
+            if wormhole_process.return_code != 0:
+                click.echo('Wormhole still open...  killing now')
+                wormhole_process.kill()
 
     click.echo('Waiting for build: {}'.format(build.human_url))
 
