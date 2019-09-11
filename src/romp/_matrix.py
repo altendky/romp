@@ -29,7 +29,7 @@ all_interpreters = tuple(interpreters.keys())
 
 
 versions = collections.OrderedDict((
-    ('CPython', ('2.7', '3.4', '3.5', '3.6', '3.7')),
+    ('CPython', ('2.7', '3.5', '3.6', '3.7')),
     ('PyPy', ('2.7', '3.5')),
 ))
 
