@@ -6,8 +6,10 @@ import io
 import itertools
 import json
 import logging
+import os
 import subprocess
 import sys
+import sysconfig
 
 import click
 import click.types
@@ -563,16 +565,9 @@ def main(
     else:
         wormhole_code = '42'
         click.echo('Opening wormhole')
-        entry_point_run_code = (
-            "import pkg_resources"
-            "; pkg_resources.load_entry_point("
-            "'magic-wormhole', 'console_scripts', 'wormhole'"
-            ")()"
-        )
         wormhole_process = subprocess.Popen(
             [
-                sys.executable,
-                '-c', entry_point_run_code,
+                os.path.join(sysconfig.get_path('scripts'), 'wormhole')
                 'send',
                 '--code', wormhole_code,
             ]
