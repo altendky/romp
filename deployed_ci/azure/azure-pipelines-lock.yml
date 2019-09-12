@@ -21,7 +21,7 @@ jobs:
     displayName: Get input archive
     steps:
       - bash: |
-          if [[ -z "$(wormhole_code)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else pip install wormhole; wormhole receive "$(wormhole_code)" --output-file input.tar.gz; fi
+          if [[ -z "$(wormhole_code)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else pip install wheel; pip install wormhole; wormhole receive "$(wormhole_code)" --output-file input.tar.gz; fi
         displayName: Get input archive
       - task: PublishPipelineArtifact@0
         inputs:
