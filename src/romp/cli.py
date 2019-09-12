@@ -559,21 +559,21 @@ def main(
         )
         archive_bytes = archive_bytesio.getvalue()
 
-    if archive_bytes is None:
-        wormhole_code = ''
-        wormhole_process = None
-    else:
-        wormhole_code = '42'
-        click.echo('Opening wormhole')
-        wormhole_process = subprocess.Popen(
-            [
-                os.path.join(sysconfig.get_path('scripts'), 'wormhole'),
-                'send',
-                '--code', wormhole_code,
-            ]
-        )
+    wormhole_code = ''
+    wormhole_process = None
 
     try:
+        if archive_bytes is not None:
+            wormhole_code = '42'
+            click.echo('Opening wormhole')
+            wormhole_process = subprocess.Popen(
+                [
+                    os.path.join(sysconfig.get_path('scripts'), 'wormhole'),
+                    'send',
+                    '--code', wormhole_code,
+                ]
+            )
+
         click.echo('Requesting build')
         build = romp._core.request_remote_lock_build(
             wormhole_code=wormhole_code,
@@ -586,16 +586,16 @@ def main(
             definition_id=definition_id,
             artifact_paths=artifact_paths,
         )
+
+        click.echo('Waiting for build: {}'.format(build.human_url))
+
+        response_json = build.wait_for_lock_build(check_period=check_period)
     finally:
         if wormhole_process is not None:
             wormhole_process.poll()
             if wormhole_process.returncode != 0:
                 click.echo('Wormhole still open...  killing now')
                 wormhole_process.kill()
-
-    click.echo('Waiting for build: {}'.format(build.human_url))
-
-    response_json = build.wait_for_lock_build(check_period=check_period)
 
     if artifact is not None:
         click.echo('Handling artifact')
