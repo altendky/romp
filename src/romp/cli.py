@@ -567,7 +567,7 @@ def main(
         click.echo('Opening wormhole')
         wormhole_process = subprocess.Popen(
             [
-                os.path.join(sysconfig.get_path('scripts'), 'wormhole')
+                os.path.join(sysconfig.get_path('scripts'), 'wormhole'),
                 'send',
                 '--code', wormhole_code,
             ]
