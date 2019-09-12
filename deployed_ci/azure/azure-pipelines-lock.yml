@@ -24,7 +24,7 @@ jobs:
         inputs:
           versionSpec: 3.7
       - bash: |
-          if [[ -z "$(wormhole_code)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else python -m pip install wheel; python -m pip install magic-wormhole; python -c 'import os; import pathlib; import subprocess; import sys; import sysconfig;  subprocess.run([os.fspath(pathlib.Path(sysconfig.get_path("scripts"))/"wormhole"), *sys.argv])' receive "$(wormhole_code)" --output-file input.tar.gz; fi
+          if [[ -z "$(wormhole_code)" ]]; then tar -cvzf input.tar.gz --files-from /dev/null; else python -m pip install wheel; python -m pip install magic-wormhole; python -c 'import os; import pathlib; import subprocess; import sys; import sysconfig;  command = [os.fspath(pathlib.Path(sysconfig.get_path("scripts"))/"wormhole"), *sys.argv]; print("running: {}'.format(command)); subprocess.run(command)' receive "$(wormhole_code)" --output-file input.tar.gz; fi
         displayName: Get input archive
       - task: PublishPipelineArtifact@0
         inputs:
