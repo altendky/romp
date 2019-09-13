@@ -11,6 +11,7 @@ import random
 import subprocess
 import sys
 import sysconfig
+import tempfile
 
 import click
 import click.types
@@ -562,9 +563,16 @@ def main(
 
     wormhole_code = ''
     wormhole_process = None
+    wormhole_file = None
 
     try:
         if archive_bytes is not None:
+            wormhole_file = tempfile.NamedTemporaryFile(delete=False)
+            try:
+                wormhole_file.write(archive_bytes)
+            finally:
+                wormhole_file.close()
+
             channel_id = random.randrange(10000, 99999)
             wormhole_code = '{}-42abc04308c0c80lhk3kda078'.format(channel_id)
             click.echo('Opening wormhole')
@@ -573,6 +581,7 @@ def main(
                     os.path.join(sysconfig.get_path('scripts'), 'wormhole'),
                     'send',
                     '--code', wormhole_code,
+                    wormhole_file.name,
                 ]
             )
 
@@ -593,11 +602,15 @@ def main(
 
         response_json = build.wait_for_lock_build(check_period=check_period)
     finally:
-        if wormhole_process is not None:
-            wormhole_process.poll()
-            if wormhole_process.returncode != 0:
-                click.echo('Wormhole still open...  killing now')
-                wormhole_process.kill()
+        try:
+            if wormhole_process is not None:
+                wormhole_process.poll()
+                if wormhole_process.returncode != 0:
+                    click.echo('Wormhole still open...  killing now')
+                    wormhole_process.kill()
+        finally:
+            if wormhole_file is not None:
+                os.unlink(wormhole_file)
 
     if artifact is not None:
         click.echo('Handling artifact')
