@@ -564,7 +564,7 @@ def main(
 
     try:
         if archive_bytes is not None:
-            wormhole_code = '42'
+            wormhole_code = '42abc04308c0c80lhk3kda078'
             click.echo('Opening wormhole')
             wormhole_process = subprocess.Popen(
                 [
