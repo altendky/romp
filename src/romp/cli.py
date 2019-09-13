@@ -7,6 +7,7 @@ import itertools
 import json
 import logging
 import os
+import random
 import subprocess
 import sys
 import sysconfig
@@ -564,7 +565,8 @@ def main(
 
     try:
         if archive_bytes is not None:
-            wormhole_code = '42abc04308c0c80lh-k3kda078'
+            channel_id = random.randrange(10000, 99999)
+            wormhole_code = '{}-42abc04308c0c80lhk3kda078'.format(channel_id)
             click.echo('Opening wormhole')
             wormhole_process = subprocess.Popen(
                 [
