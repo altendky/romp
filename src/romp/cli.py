@@ -610,7 +610,7 @@ def main(
                     wormhole_process.kill()
         finally:
             if wormhole_file is not None:
-                os.unlink(wormhole_file)
+                os.unlink(wormhole_file.name)
 
     if artifact is not None:
         click.echo('Handling artifact')
