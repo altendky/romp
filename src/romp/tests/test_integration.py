@@ -22,6 +22,7 @@ def test_all():
             '--interpreter', 'cpYThon',
             '--version', '3.7',
             '--architecture', 'x86_64',
+            '--platform', 'all',
             '--exclude', 'Windows', 'CPython', '3.7', 'x86_64',
             '--include', 'Linux', 'PyPy', '3.5', 'x86_64',
             '--archive-paths-root', here,
