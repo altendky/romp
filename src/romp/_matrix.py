@@ -228,12 +228,6 @@ def main():
     test_environments = [
         environment
         for environment in build_all_environments()
-        if not (
-            environment.platform == 'Windows'
-            and environment.interpreter == 'CPython'
-            and environment.version != '3.7'
-            and environment.architecture == 'x86'
-        )
     ]
 
     parser.add_argument(
