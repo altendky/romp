@@ -245,7 +245,7 @@ def create_artifact_paths_option(
 
 
 platforms_choice = Choice(
-    choices=romp._matrix.all_platforms + ['all'],
+    choices=romp._matrix.all_platforms + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -265,7 +265,7 @@ def create_matrix_platforms_option(
 
 
 interpreters_choice = Choice(
-    choices=romp._matrix.all_interpreters + ['all'],
+    choices=romp._matrix.all_interpreters + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -285,7 +285,7 @@ def create_matrix_interpreters_option(
 
 
 versions_choice = Choice(
-    choices=romp._matrix.all_versions + ['all'],
+    choices=romp._matrix.all_versions + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -311,7 +311,7 @@ all_architectures = [
 
 
 architectures_choice = Choice(
-    choices=all_architectures + ['all'],
+    choices=all_architectures + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
