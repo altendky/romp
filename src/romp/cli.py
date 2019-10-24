@@ -304,10 +304,10 @@ def create_matrix_versions_option(
     )
 
 
-all_architectures = [
+all_architectures = tuple(
     str(architecture)
     for architecture in romp._matrix.all_architectures
-]
+)
 
 
 architectures_choice = Choice(
