@@ -15,7 +15,7 @@ jobs:
   - job: dist
     displayName: Build Wheel and sdist
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
     steps:
       - task: UsePythonVersion@0
         inputs:
@@ -76,7 +76,7 @@ jobs:
     displayName: Publish
     dependsOn: test
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
     steps:
       - task: UsePythonVersion@0
         inputs:
