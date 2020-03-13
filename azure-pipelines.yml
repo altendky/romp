@@ -4,6 +4,10 @@ trigger:
   tags:
     include: ['*']
 
+pr:
+  branches:
+    include: ['*']
+
 jobs:
   - job: generate_matrix
     displayName: Generate Matrix
