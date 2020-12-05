@@ -177,7 +177,7 @@ def request_remote_lock_build(
 
     try:
         response_json = response.json()
-    except json.JSONDecodeError:
+    except getattr(json, 'JSONDecodeError', ValueError):
         response_json_text = '<failed to decode JSON>'
     else:
         response_json_text = json.dumps(response_json, indent=4)
