@@ -93,11 +93,11 @@ jobs:
     displayName: Coalesce artifacts
     dependsOn: romp_on
     pool:
-      vmImage: 'ubuntu-16.04'
+      vmImage: 'ubuntu-latest'
     steps:
       - task: UsePythonVersion@0
         inputs:
-          versionSpec: 3.7
+          versionSpec: 3.9
           architecture: x64
       - task: DownloadBuildArtifacts@0
         inputs:
