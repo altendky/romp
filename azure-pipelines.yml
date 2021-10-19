@@ -11,6 +11,8 @@ pr:
 jobs:
   - job: generate_matrix
     displayName: Generate Matrix
+    pool:
+      vmImage: 'ubuntu-latest'
     steps:
       - bash: |
           python src/romp/_matrix.py
