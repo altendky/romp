@@ -169,7 +169,7 @@ def build_all_environments():
                 )
                 or (
                         platform == 'macOS'
-                        and interpreter == 'CPython
+                        and interpreter == 'CPython'
                         and version in {'2.7', '3.5', '3.6'}
                 )
         )
