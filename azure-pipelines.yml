@@ -63,6 +63,12 @@ jobs:
           python -m pip install tox pytest-azurepipelines
         displayName: Install tox
       - bash: |
+          echo "##vso[task.setvariable variable=CRYPTOGRAPHY_SUPPRESS_LINK_FLAGS]1"
+          echo "##vso[task.setvariable variable=LDFLAGS]/usr/local/opt/openssl\\@1.1/lib/libcrypto.a /usr/local/opt/openssl\\@1.1/lib/libssl.a"
+          echo "##vso[task.setvariable variable=CFLAGS]-I/usr/local/opt/openssl\\@1.1/include -Werror -Wno-error=deprecated-declarations -Wno-error=incompatible-pointer-types-discards-qualifiers -Wno-error=unused-function -Wno-error=unused-command-line-argument -mmacosx-version-min=10.9"
+        displayName: Set OpenSSL build variables - macOS PyPy
+        condition: and(eq( variables['Agent.OS'], 'Darwin' ), startsWith(variables.versionSpec, 'pypy'))
+      - bash: |
           python -m tox -e ${TOXENV} --installpkg dist/*.whl
         displayName: tox
         env:

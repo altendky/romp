@@ -6,7 +6,12 @@ import io
 import itertools
 import json
 import logging
+import os
+import random
+import subprocess
 import sys
+import sysconfig
+import tempfile
 
 import click
 import click.types
@@ -543,7 +548,6 @@ def main(
 
     environments_string = romp._matrix.string_from_environments(environments)
 
-    archive_url = None
     archive_bytes = None
     if archive_file is not None:
         archive_bytes = archive_file.read()
@@ -557,27 +561,56 @@ def main(
         )
         archive_bytes = archive_bytesio.getvalue()
 
-    if archive_bytes is not None:
-        click.echo('Uploading archive')
-        archive_url = romp._core.post_file(data=archive_bytes)
-        click.echo('Archive URL: {}'.format(archive_url))
+    wormhole_code = ''
+    wormhole_process = None
+    wormhole_file = None
 
-    click.echo('Requesting build')
-    build = romp._core.request_remote_lock_build(
-        archive_url=archive_url,
-        username=username,
-        personal_access_token=personal_access_token,
-        build_request_url=build_request_url,
-        command=command,
-        environments=environments_string,
-        source_branch=source_branch,
-        definition_id=definition_id,
-        artifact_paths=artifact_paths,
-    )
+    try:
+        if archive_bytes is not None:
+            wormhole_file = tempfile.NamedTemporaryFile(delete=False)
+            try:
+                wormhole_file.write(archive_bytes)
+            finally:
+                wormhole_file.close()
 
-    click.echo('Waiting for build: {}'.format(build.human_url))
+            channel_id = random.randrange(10000, 99999)
+            wormhole_code = '{}-42abc04308c0c80lhk3kda078'.format(channel_id)
+            click.echo('Opening wormhole')
+            wormhole_process = subprocess.Popen(
+                [
+                    os.path.join(sysconfig.get_path('scripts'), 'wormhole'),
+                    'send',
+                    '--code', wormhole_code,
+                    wormhole_file.name,
+                ]
+            )
 
-    response_json = build.wait_for_lock_build(check_period=check_period)
+        click.echo('Requesting build')
+        build = romp._core.request_remote_lock_build(
+            wormhole_code=wormhole_code,
+            username=username,
+            personal_access_token=personal_access_token,
+            build_request_url=build_request_url,
+            command=command,
+            environments=environments_string,
+            source_branch=source_branch,
+            definition_id=definition_id,
+            artifact_paths=artifact_paths,
+        )
+
+        click.echo('Waiting for build: {}'.format(build.human_url))
+
+        response_json = build.wait_for_lock_build(check_period=check_period)
+    finally:
+        try:
+            if wormhole_process is not None:
+                wormhole_process.poll()
+                if wormhole_process.returncode != 0:
+                    click.echo('Wormhole still open...  killing now')
+                    wormhole_process.kill()
+        finally:
+            if wormhole_file is not None:
+                os.unlink(wormhole_file.name)
 
     if artifact is not None:
         click.echo('Handling artifact')
