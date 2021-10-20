@@ -245,7 +245,7 @@ def create_artifact_paths_option(
 
 
 platforms_choice = Choice(
-    choices=romp._matrix.all_platforms,
+    choices=romp._matrix.all_platforms + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -257,7 +257,6 @@ def create_matrix_platforms_option(
     return create_option(
         '--platform',
         'matrix_platforms',
-        default=romp._matrix.all_platforms,
         envvar=envvar,
         help='Platforms to matrix across',
         multiple=True,
@@ -266,7 +265,7 @@ def create_matrix_platforms_option(
 
 
 interpreters_choice = Choice(
-    choices=romp._matrix.all_interpreters,
+    choices=romp._matrix.all_interpreters + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -278,7 +277,6 @@ def create_matrix_interpreters_option(
     return create_option(
         '--interpreter',
         'matrix_interpreters',
-        default=romp._matrix.all_interpreters,
         envvar=envvar,
         help='Interpreters to matrix across',
         multiple=True,
@@ -287,7 +285,7 @@ def create_matrix_interpreters_option(
 
 
 versions_choice = Choice(
-    choices=romp._matrix.all_versions,
+    choices=romp._matrix.all_versions + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -299,7 +297,6 @@ def create_matrix_versions_option(
     return create_option(
         '--version',
         'matrix_versions',
-        default=romp._matrix.all_versions,
         envvar=envvar,
         help='Versions to matrix across',
         multiple=True,
@@ -307,14 +304,14 @@ def create_matrix_versions_option(
     )
 
 
-all_architectures = [
+all_architectures = tuple(
     str(architecture)
     for architecture in romp._matrix.all_architectures
-]
+)
 
 
 architectures_choice = Choice(
-    choices=all_architectures,
+    choices=all_architectures + ('all',),
     case_sensitive=False,
     coerce_case=True,
 )
@@ -326,7 +323,6 @@ def create_matrix_architectures_option(
     return create_option(
         '--architecture',
         'matrix_architectures',
-        default=all_architectures,
         envvar=envvar,
         help='Architectures to matrix across',
         multiple=True,
@@ -487,6 +483,18 @@ def main(
         glob.glob(path)
         for path in archive_paths
     ))
+
+    if 'all' in matrix_platforms:
+        matrix_platforms = romp._matrix.all_platforms
+
+    if 'all' in matrix_interpreters:
+        matrix_interpreters = romp._matrix.all_interpreters
+
+    if 'all' in matrix_versions:
+        matrix_versions = romp._matrix.all_versions
+
+    if 'all' in matrix_architectures:
+        matrix_architectures = romp._matrix.all_architectures
 
     matrix_specified = any(
         len(dimension) > 0
