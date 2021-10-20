@@ -155,19 +155,6 @@ def create_username_option(
     )
 
 
-def create_environments_option(
-        envvar='ROMP_ENVIRONMENTS',
-):
-    return create_option(
-        '--environments',
-        envvar=envvar,
-        help=(
-            'Targets to run on.  Mostly use the matrix options instead.'
-            '  This may be removed.'
-        ),
-    )
-
-
 def create_check_period_option(
         envvar='ROMP_CHECK_PERIOD',
 ):
@@ -208,15 +195,61 @@ def create_definition_id_option(
     )
 
 
-def create_archive_option(
+import attr
+
+
+# @attr.s
+# class ExclusiveType:
+#     type = attr.ib()
+
+
+@attr.s
+class ExclusiveOptionGroup:
+    options = attr.ib(factory=list)
+
+    # @functools.wraps(click.option)
+    # def __call__(self, *args, **kwargs):
+    #     self.add_option(click.option(*args, **kwargs))
+
+    def add_option(self, option):
+        self.options.append((option, option.callback))
+        option.callback = self.callback
+
+    def callback(self, ctx, param, value):
+        for option, callback in self.options:
+            if option is param:
+                break
+        else:
+             raise MakeAnExceptionError()
+
+        print()
+
+archive_file_paths_exclusive_group = ExclusiveOptionGroup()
+
+
+# def archive_file_callback(ctx, param, value):
+#     archive_file_paths_conflict_check(
+#         file=value,
+#         paths=ctx.params.get('archive_paths', ()),
+#         message='Exclusive with --archive-path, specify only one.',
+#     )
+#
+#     return value
+
+
+def create_archive_file_option(
         envvar='ROMP_ARCHIVE',
 ):
-    return create_option(
+    option = create_option(
         '--archive-file',
         envvar=envvar,
         help='The archive to be uploaded to the build',
         type=click.File('rb'),
     )
+
+    archive_file_paths_exclusive_group.add_option(option)
+
+    return option
 
 
 def create_artifact_option(
@@ -393,10 +426,28 @@ def create_archive_paths_root_option(
     )
 
 
+# def archive_file_paths_conflict_check(file, paths, message):
+#     if file is not None and paths != ():
+#         raise click.BadParameter(message=message)
+#
+#
+# def archive_paths_callback(ctx, param, value):
+#     archive_file_paths_conflict_check(
+#         file=ctx.params.get('archive_file'),
+#         paths=value,
+#         message='Exclusive with --archive-file, specify only one.',
+#     )
+#
+#     return list(itertools.chain.from_iterable(
+#         glob.glob(path)
+#         for path in value
+#     ))
+
+
 def create_archive_paths_option(
         envvar='ROMP_ARCHIVE_PATHS',
 ):
-    return create_option(
+    option = create_option(
         '--archive-path',
         'archive_paths',
         envvar=envvar,
@@ -406,6 +457,10 @@ def create_archive_paths_option(
         ),
         multiple=True,
     )
+
+    archive_file_paths_exclusive_group.add_option(option)
+
+    return option
 
 
 def create_verbose_option(
@@ -441,11 +496,10 @@ def logging_level_from_verbosity(verbosity):
 @create_build_request_url_option()
 @create_command_option()
 @create_username_option()
-@create_environments_option()
 @create_check_period_option()
 @create_source_branch_option()
 @create_definition_id_option()
-@create_archive_option()
+@create_archive_file_option()
 @create_artifact_option()
 @create_artifact_paths_option()
 @create_matrix_platforms_option()
@@ -462,7 +516,6 @@ def main(
         build_request_url,
         command,
         username,
-        environments,
         check_period,
         source_branch,
         definition_id,
@@ -482,31 +535,6 @@ def main(
     root_logger = logging.getLogger()
     root_logger.setLevel(logging_level_from_verbosity(verbosity))
     root_logger.addHandler(logging.StreamHandler())
-
-    archive_paths = list(itertools.chain.from_iterable(
-        glob.glob(path)
-        for path in archive_paths
-    ))
-
-    matrix_specified = any(
-        len(dimension) > 0
-        for dimension in (
-            matrix_platforms,
-            matrix_interpreters,
-            matrix_versions,
-            matrix_architectures,
-        )
-    )
-
-    if environments is not None and matrix_specified:
-        # TODO: this isn't really nice, maybe drop environments all together?
-        #       or maybe it turns into '--include Windows,CPython,3.7,6.4' etc?
-        click.echo('Specify either an environments list or matrix parameters')
-        sys.exit(1)
-
-    if archive_file is not None and len(archive_paths) > 0:
-        click.echo('Specify either an archive file or archive paths')
-        sys.exit(1)
 
     environments = romp._matrix.build_environments(
         platforms=matrix_platforms,
