@@ -50,7 +50,7 @@ setuptools.setup(
     },
     install_requires=[
         # 'attrs',
-        'click',
+        'click~=7.1',
         'requests',
     ],
     extras_require={
